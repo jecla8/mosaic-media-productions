@@ -99,7 +99,32 @@ nav.scrolled{padding:.75rem 4rem}
 .mobile-menu a{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:#fff;transition:color .3s}
 .mobile-menu a:hover{color:var(--gold)}
 .mobile-menu .m-cta{margin-top:1rem;padding:.9rem 2.5rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.2);font-size:.8rem}
-@media(max-width:640px){.nav-burger{display:flex}.nav-cta{display:none}nav{padding:1rem 1.5rem}}
+@media(max-width:640px){
+  nav{
+    flex-direction:column;
+    padding:.7rem 1.2rem .5rem;
+    gap:.5rem;
+    align-items:flex-start;
+  }
+  .nav-logo img{height:22px}
+  .nav-burger{display:none}
+  .nav-cta{display:none}
+  .nav-links{
+    display:flex;
+    overflow-x:auto;
+    gap:1.4rem;
+    width:100%;
+    padding-bottom:.4rem;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{
+    font-size:.65rem;
+    white-space:nowrap;
+    letter-spacing:.5px;
+  }
+}
 
 /* ── HERO ── */
 .hero{height:100vh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
