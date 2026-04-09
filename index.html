@@ -3,371 +3,725 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mosaic Media Productions - Website Prototypes</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>Mosaic Media Productions</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Inter', sans-serif;
-    background: #000;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-  }
-  .logo { height: 40px; margin-bottom: 2rem; }
-  h1 {
-    font-size: 2.5rem;
-    font-weight: 900;
-    text-align: center;
-    margin-bottom: 0.5rem;
-  }
-  h1 span { color: #0f87ff; }
-  .subtitle {
-    color: #666;
-    font-size: 1rem;
-    text-align: center;
-    margin-bottom: 4rem;
-    max-width: 500px;
-  }
-  .prototypes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    max-width: 1100px;
-    width: 100%;
-  }
-  .proto-card {
-    background: #0a0a0a;
-    border: 1px solid #1a1a1a;
-    padding: 2.5rem;
-    transition: all 0.4s;
-    cursor: pointer;
-    text-decoration: none;
-    color: #fff;
-    display: block;
-    position: relative;
-    overflow: hidden;
-  }
-  .proto-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    transition: all 0.4s;
-  }
-  .proto-card:nth-child(1)::before { background: #c9b99a; transform: scaleX(0); }
-  .proto-card:nth-child(2)::before { background: #0f87ff; transform: scaleX(0); }
-  .proto-card:nth-child(3)::before { background: linear-gradient(90deg, #0f87ff, #c9b99a); transform: scaleX(0); }
-  .proto-card:hover::before { transform: scaleX(1); }
-  .proto-card:hover {
-    border-color: #333;
-    transform: translateY(-5px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-  .proto-num {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #555;
-    margin-bottom: 1.5rem;
-  }
-  .proto-card:nth-child(1) .proto-num { color: #c9b99a; }
-  .proto-card:nth-child(2) .proto-num { color: #0f87ff; }
-  .proto-card:nth-child(3) .proto-num { color: #a090ff; }
-  .proto-title {
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-  }
-  .proto-desc {
-    color: #888;
-    font-size: 0.9rem;
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-  }
-  .proto-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-bottom: 1.5rem;
-  }
-  .tag {
-    padding: 0.3rem 0.7rem;
-    background: #1a1a1a;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: #666;
-  }
-  .proto-link {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #555;
-    transition: color 0.3s;
-  }
-  .proto-card:hover .proto-link { color: #fff; }
-  .pointers {
-    max-width: 1100px;
-    width: 100%;
-    margin-top: 5rem;
-    padding-top: 3rem;
-    border-top: 1px solid #1a1a1a;
-  }
-  .pointers h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: 2rem;
-  }
-  .pointers h2 span { color: #0f87ff; }
-  .pointer-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-  .pointer {
-    background: #0a0a0a;
-    border: 1px solid #1a1a1a;
-    padding: 2rem;
-  }
-  .pointer-priority {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-  .high { background: rgba(217,79,79,0.15); color: #d94f4f; }
-  .med { background: rgba(255,165,0,0.15); color: orange; }
-  .pointer h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .pointer p { color: #888; font-size: 0.85rem; line-height: 1.7; }
-  @media (max-width: 768px) {
-    .prototypes, .pointer-grid { grid-template-columns: 1fr; }
-    h1 { font-size: 1.8rem; }
-  }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#000;
+  --white:#fff;
+  --gold:#c9b99a;
+  --gold-light:#ddd0bc;
+  --gold-glow:rgba(201,185,154,.18);
+  --border:#1a1a1a;
+  --text-muted:#666;
+  --btn-bg:rgba(255,255,255,.10);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden}
+
+/* ── INTRO ANIMATION (Netflix-style) ── */
+#intro{
+  position:fixed;inset:0;background:#000;
+  z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .9s cubic-bezier(.7,0,.3,1);
+  pointer-events:none;
+}
+#intro.exit{opacity:0}
+.intro-logo{
+  height:56px;
+  opacity:0;
+  filter:brightness(0) invert(1) sepia(.35) saturate(1.4) brightness(1.15)
+         drop-shadow(0 0 30px rgba(201,185,154,.9))
+         drop-shadow(0 0 80px rgba(201,185,154,.4));
+  animation:introLogoIn .8s .3s cubic-bezier(.16,1,.3,1) forwards;
+}
+.intro-glow{
+  position:absolute;
+  width:300px;height:300px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(201,185,154,.12) 0%, transparent 70%);
+  opacity:0;
+  animation:introGlow 1.2s .3s ease forwards;
+}
+@keyframes introLogoIn{
+  0%{opacity:0;transform:scale(.82)}
+  60%{opacity:1;transform:scale(1.03)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes introGlow{
+  0%{opacity:0;transform:scale(.5)}
+  50%{opacity:1;transform:scale(1)}
+  100%{opacity:.6;transform:scale(1.2)}
+}
+
+/* REVEAL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.reveal.vis{opacity:1;transform:none}
+.s1{transition-delay:.08s}.s2{transition-delay:.16s}.s3{transition-delay:.24s}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.2rem 4rem;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  transition:padding .4s;
+}
+nav.scrolled{padding:.75rem 4rem}
+.nav-logo img{height:34px;filter:brightness(0) invert(1) sepia(.35) saturate(1.4) brightness(1.15) drop-shadow(0 0 12px rgba(201,185,154,.6))}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{
+  font-size:.75rem;font-weight:500;color:#999;
+  text-decoration:none;letter-spacing:1px;text-transform:uppercase;
+  transition:color .3s;position:relative;
+}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width .3s}
+.nav-links a:hover{color:var(--white)}
+.nav-links a:hover::after{width:100%}
+.nav-cta{
+  padding:.65rem 1.8rem;background:var(--btn-bg);
+  border:1px solid rgba(255,255,255,.18);
+  color:var(--white);font-size:.75rem;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;text-decoration:none;
+  transition:all .3s;backdrop-filter:blur(10px);
+}
+.nav-cta:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+.nav-burger{display:none;background:none;border:none;cursor:pointer;padding:.4rem;flex-direction:column;gap:5px;z-index:1100}
+.nav-burger span{display:block;width:22px;height:2px;background:#fff;transition:all .3s}
+.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-burger.open span:nth-child(2){opacity:0}
+.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:1050;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+.mobile-menu.open{display:flex;animation:fadeIn .3s forwards}
+.mobile-menu a{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:#fff;transition:color .3s}
+.mobile-menu a:hover{color:var(--gold)}
+.mobile-menu .m-cta{margin-top:1rem;padding:.9rem 2.5rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.2);font-size:.8rem}
+@media(max-width:640px){.nav-burger{display:flex}.nav-cta{display:none}nav{padding:1rem 1.5rem}}
+
+/* ── HERO ── */
+.hero{height:100vh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hero-mosaic-grid{
+  position:absolute;inset:0;
+  display:grid;
+  grid-template-columns:repeat(var(--cols,10),1fr);
+  grid-template-rows:repeat(var(--rows,7),1fr);
+  gap:3px;padding:3px;
+}
+.hm-tile{position:relative;cursor:pointer;overflow:hidden;transition:all .6s cubic-bezier(.25,.46,.45,.94)}
+.hm-tile img{width:100%;height:100%;object-fit:cover;filter:grayscale(70%) brightness(.28);transition:all .6s}
+.hm-tile::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.42);transition:all .4s}
+.hm-tile:hover{z-index:10;transform:scale(1.06)}
+.hm-tile:hover img{filter:grayscale(0%) brightness(.85)}
+.hm-tile:hover::after{background:rgba(201,185,154,.1)}
+.hm-tile.pulse img{filter:grayscale(20%) brightness(.45)}
+
+.hero-editorial{position:relative;z-index:20;text-align:center;padding:0 2rem;max-width:1100px;pointer-events:none}
+.hero-editorial *{pointer-events:auto}
+
+.hero-editorial h1{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:clamp(3.5rem,10vw,9rem);font-weight:800;
+  line-height:.9;letter-spacing:-4px;text-transform:uppercase;
+  text-shadow:0 4px 80px rgba(0,0,0,.9);
+  opacity:0;animation:fadeUp 1s 2.6s forwards;
+}
+.hero-editorial h1 .line-gold{color:var(--gold);display:block}
+.hero-sub{
+  font-size:.75rem;font-weight:600;letter-spacing:8px;text-transform:uppercase;
+  color:rgba(201,185,154,.6);margin-top:1.2rem;
+  opacity:0;animation:fadeUp .8s 3.1s forwards;
+}
+.hero-divider{width:60px;height:1px;background:rgba(255,255,255,.15);margin:2.2rem auto;opacity:0;animation:fadeIn .8s 3.4s forwards}
+.hero-editorial p{font-size:1rem;color:#888;max-width:420px;margin:0 auto 2.5rem;line-height:1.8;opacity:0;animation:fadeUp .8s 3.5s forwards}
+.hero-btns{display:flex;gap:1rem;justify-content:center;opacity:0;animation:fadeUp .8s 3.7s forwards}
+.btn-primary{padding:1rem 2.5rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.22);color:var(--white);font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all .3s;backdrop-filter:blur(12px)}
+.btn-primary:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.btn-ghost{padding:1rem 2.5rem;background:transparent;border:1px solid rgba(255,255,255,.12);color:#888;font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all .3s}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;animation:fadeIn 1s 4.3s forwards}
+.scroll-hint span{font-size:.6rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#333}
+.scroll-arrow{width:18px;height:18px;border-right:1px solid #444;border-bottom:1px solid #444;transform:rotate(45deg);animation:bounce 2s infinite}
+
+/* ── PILLARS / BRAND STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.stat{padding:2.5rem;text-align:center;border-right:1px solid var(--border);transition:background .4s}
+.stat:last-child{border-right:none}
+.stat:hover{background:rgba(201,185,154,.03)}
+.stat-icon{font-size:1.3rem;margin-bottom:.6rem;opacity:.4}
+.stat-num{font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:2px}
+.stat-label{font-size:.6rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-top:.4rem;line-height:1.5}
+@media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}.stat:nth-child(3){border-top:1px solid var(--border)}}
+@media(max-width:480px){.stats{grid-template-columns:1fr 1fr}}
+
+/* SHARED SECTION LABELS */
+.section-label{font-size:.65rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
+.section-desc{color:var(--text-muted);font-size:1rem;line-height:1.8;max-width:520px}
+
+/* ── ALTERNATING FLUID ROWS ── */
+.services-section{border-top:1px solid var(--border)}
+.svc-row{display:flex;min-height:500px;border-bottom:1px solid var(--border)}
+.svc-row.alt{flex-direction:row-reverse}
+
+/* ── FLUID IMAGE PANEL ── */
+.fluid-panel{
+  flex:1;position:relative;overflow:hidden;cursor:default;min-height:420px;
+  transition:box-shadow 1s ease;
+}
+.fluid-panel:hover{
+  box-shadow:0 0 120px rgba(201,185,154,.09),inset 0 0 0 1px rgba(201,185,154,.2);
+}
+.fluid-panel img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:grayscale(30%) brightness(.52);
+  transform:scale(1.0);
+  transition:transform 1.4s cubic-bezier(.25,.46,.45,.94),filter 1s ease;
+}
+.fluid-panel:hover img{transform:scale(1.06);filter:grayscale(0%) brightness(.72)}
+.fluid-panel::before{
+  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 75% 65% at 50% 45%,rgba(201,185,154,.22) 0%,rgba(201,185,154,.06) 45%,transparent 75%);
+  opacity:0;transition:opacity 1.1s ease;
+}
+.fluid-panel:hover::before{opacity:1}
+.fluid-panel::after{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.65) 100%);
+  opacity:1;transition:opacity 1s ease;
+}
+.fluid-panel:hover::after{opacity:.35}
+.fluid-bar{
+  position:absolute;top:0;left:0;width:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  z-index:5;transition:width 1s cubic-bezier(.25,.46,.45,.94);
+}
+.fluid-panel:hover .fluid-bar{width:100%}
+
+/* ── TEXT PANEL (always visible) ── */
+.svc-text{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:4rem;position:relative;
+  border-left:1px solid var(--border);
+}
+.svc-row.alt .svc-text{border-left:none;border-right:1px solid var(--border)}
+.svc-text-num{
+  font-family:'Bricolage Grotesque',sans-serif;font-size:5rem;font-weight:800;
+  color:var(--border);line-height:1;
+  position:absolute;top:2rem;right:2.5rem;
+  user-select:none;transition:color .6s;
+}
+.svc-row:hover .svc-text-num{color:rgba(201,185,154,.05)}
+.svc-text-label{font-size:.6rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.svc-text h3{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:700;line-height:1.15;margin-bottom:1.2rem}
+.svc-text p{color:var(--text-muted);font-size:.95rem;line-height:1.8;max-width:380px;margin-bottom:2rem}
+.svc-text-divider{width:32px;height:1px;background:var(--border);margin-bottom:1.5rem;transition:width .6s ease,background .6s ease}
+.svc-row:hover .svc-text-divider{width:56px;background:rgba(201,185,154,.3)}
+.svc-text-tags{display:flex;flex-wrap:wrap;gap:.5rem}
+.svc-tag{padding:.3rem .8rem;font-size:.6rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border);color:#555;transition:all .4s}
+.svc-row:hover .svc-tag{border-color:rgba(201,185,154,.2);color:#888}
+
+@media(max-width:960px){
+  .svc-row,.svc-row.alt{flex-direction:column}
+  .fluid-panel{min-height:320px}
+  .svc-text{padding:2.5rem 1.5rem;border-left:none;border-right:none;border-top:1px solid var(--border)}
+  .svc-row.alt .svc-text{border-right:none;border-top:1px solid var(--border)}
+  .svc-text-num{font-size:3rem;top:1rem;right:1rem}
+}
+
+/* ── CLIENT MARQUEE ── */
+.marquee-section{padding:3rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden}
+.marquee-label{text-align:center;font-size:.6rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#2a2a2a;margin-bottom:2rem}
+.marquee-track{display:flex;animation:marquee 30s linear infinite;width:max-content}
+.marquee-track:hover{animation-play-state:paused}
+.marquee-item{padding:0 2.5rem;font-family:'Bricolage Grotesque',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#222;white-space:nowrap;transition:color .3s;cursor:default}
+.marquee-item:hover{color:var(--gold)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SIZZLE REEL ── */
+.reel-section{
+  position:relative;overflow:hidden;
+  height:70vh;min-height:420px;
+  background:#030303;
+  border-top:1px solid var(--border);
+}
+.reel-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  opacity:.7;
+}
+/* Cinematic animated gradient — shows as fallback or behind video */
+.reel-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(125deg,#050505 0%,#0d0800 30%,#050510 60%,#000 100%);
+  background-size:400% 400%;
+  animation:reelShift 12s ease infinite;
+}
+@keyframes reelShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+/* Subtle scan line effect */
+.reel-scanlines{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+}
+/* Vignette */
+.reel-vignette{
+  position:absolute;inset:0;z-index:2;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.8) 100%);
+}
+/* Gold spotlight that pulses */
+.reel-spotlight{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(201,185,154,.05) 0%,transparent 70%);
+  animation:reelPulse 4s ease-in-out infinite;
+}
+@keyframes reelPulse{
+  0%,100%{opacity:.5}
+  50%{opacity:1}
+}
+.reel-content{
+  position:absolute;inset:0;z-index:5;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem;
+}
+.reel-label{
+  font-size:.6rem;font-weight:700;letter-spacing:5px;text-transform:uppercase;
+  color:rgba(201,185,154,.4);margin-bottom:1.5rem;
+}
+.reel-title{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:clamp(1.5rem,4vw,3rem);font-weight:800;
+  color:rgba(255,255,255,.08);letter-spacing:-1px;text-transform:uppercase;
+}
+/* Bottom left corner label */
+.reel-corner{
+  position:absolute;bottom:2rem;left:3rem;z-index:6;
+  display:flex;align-items:center;gap:.8rem;
+}
+.reel-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--gold);
+  animation:reelPulse 2s ease-in-out infinite;
+}
+.reel-corner-text{font-size:.65rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(201,185,154,.5)}
+/* Bottom right CTA */
+.reel-cta-wrap{position:absolute;bottom:2rem;right:3rem;z-index:6}
+.reel-cta{
+  display:inline-block;padding:.65rem 1.6rem;
+  border:1px solid rgba(201,185,154,.2);color:rgba(201,185,154,.6);
+  font-size:.7rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  text-decoration:none;transition:all .4s;backdrop-filter:blur(8px);
+  background:rgba(0,0,0,.4);
+}
+.reel-cta:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,185,154,.06)}
+
+/* ── ACCORDION ── */
+.acc-section{padding:6rem 4rem}
+@media(max-width:768px){.acc-section{padding:5rem 1.5rem}}
+.accordion{margin-top:3rem;max-width:780px}
+.acc-item{border-bottom:1px solid var(--border)}
+.acc-trigger{width:100%;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 0;background:none;border:none;color:var(--white);cursor:pointer;transition:all .3s;text-align:left}
+.acc-trigger:hover{color:var(--gold)}
+.acc-trigger h3{font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:600}
+.acc-icon{position:relative;width:28px;height:28px;border:1px solid var(--border);flex-shrink:0;transition:all .4s}
+.acc-icon::before,.acc-icon::after{content:'';position:absolute;top:50%;left:50%;background:var(--white);transition:all .3s}
+.acc-icon::before{width:12px;height:1px;transform:translate(-50%,-50%)}
+.acc-icon::after{width:1px;height:12px;transform:translate(-50%,-50%)}
+.acc-item.open .acc-icon{border-color:var(--gold);transform:rotate(45deg)}
+.acc-item.open .acc-icon::before,.acc-item.open .acc-icon::after{background:var(--gold)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.16,1,.3,1)}
+.acc-body-inner{padding:0 0 1.5rem;color:var(--text-muted);font-size:.9rem;line-height:1.8;max-width:580px}
+
+/* ── TESTIMONIAL ── */
+.testimonial{text-align:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:6rem 4rem}
+@media(max-width:768px){.testimonial{padding:5rem 1.5rem}}
+.testimonial blockquote{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.1rem,2.5vw,1.7rem);font-weight:300;max-width:720px;margin:1.5rem auto;line-height:1.7;color:#bbb;font-style:italic}
+.testimonial cite{font-style:normal;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+.testimonial .cite-role{font-size:.7rem;color:#444;margin-top:.3rem}
+
+/* ── CONTACT FORM ── */
+.cta-section{text-align:center;padding:7rem 4rem}
+@media(max-width:768px){.cta-section{padding:5rem 1.5rem}}
+.cta-section .section-desc{margin:0 auto 3rem}
+.contact-form{max-width:580px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.contact-form input,.contact-form textarea,.contact-form select{width:100%;padding:.95rem 1.2rem;background:rgba(255,255,255,.04);border:1px solid #222;color:#fff;font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
+.contact-form input::placeholder,.contact-form textarea::placeholder{color:#444}
+.contact-form select option{background:#111}
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{border-color:var(--gold)}
+.contact-form textarea{resize:vertical;min-height:120px}
+.btn-form{width:100%;padding:1rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .3s}
+.btn-form:hover{background:rgba(255,255,255,.18)}
+.form-success{display:none;text-align:center;color:var(--gold);font-weight:600;letter-spacing:1px;font-size:.9rem}
+@media(max-width:640px){.form-row{grid-template-columns:1fr}}
+
+/* ── FOOTER ── */
+footer{padding:4rem;border-top:1px solid var(--border);display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand img{height:30px;margin-bottom:1rem;filter:brightness(0) invert(1) sepia(.35) saturate(1.4) brightness(1.15) drop-shadow(0 0 10px rgba(201,185,154,.5))}
+.footer-brand p{color:#444;font-size:.85rem;line-height:1.7}
+.footer-col h4{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:.6rem}
+.footer-col a{color:#444;text-decoration:none;font-size:.85rem;transition:color .3s}
+.footer-col a:hover{color:var(--white)}
+.footer-bottom{grid-column:1/-1;padding-top:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.footer-bottom span{font-size:.7rem;color:#333}
+.social{display:flex;gap:.8rem}
+.social a{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:#444;text-decoration:none;font-size:.75rem;font-weight:700;transition:all .3s}
+.social a:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:1024px){footer{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){footer{grid-template-columns:1fr;padding:3rem 1.5rem}}
+
+.back-link{position:fixed;bottom:1.5rem;right:1.5rem;z-index:900;padding:.55rem 1.1rem;background:rgba(0,0,0,.85);border:1px solid #222;color:#555;font-size:.65rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;backdrop-filter:blur(10px);transition:all .3s}
+.back-link:hover{border-color:var(--gold);color:var(--gold)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translate(0)}50%{transform:rotate(45deg) translate(5px,5px)}}
 </style>
 </head>
 <body>
 
-<img src="logo.png" alt="Mosaic Media" class="logo">
-<h1>Website <span>Prototypes</span></h1>
-<p class="subtitle">Six design directions for MosaicMediaProductions.com. Click to view each prototype.</p>
-
-<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
-  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c9b99a;margin-bottom:0.5rem;">Round 4 — Combined Concepts, Refined</div>
-  <div style="font-size:0.9rem;color:#555;">Alternating rows + "Mosaic Vision" headline + East Coast positioning. Two card interaction styles to compare.</div>
-</div>
-<div class="prototypes" style="margin-bottom:3rem;">
-  <a href="prototype-g-mosaic-vision.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype G</div>
-    <div class="proto-title">Mosaic Vision — Flip</div>
-    <div class="proto-desc">Alternating text/image rows combined with 3D flip cards. Hover the image panel to rotate 180° and reveal service description + CTA. "Mosaic Vision" headline. East Coast positioning.</div>
-    <div class="proto-tags">
-      <span class="tag">3D Flip</span>
-      <span class="tag">Alternating Rows</span>
-      <span class="tag">Mosaic Vision</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-  <a href="prototype-h-fluid-illuminate.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype H</div>
-    <div class="proto-title">Mosaic Vision — Illuminate</div>
-    <div class="proto-desc">Same alternating rows, but hover triggers a cinematic illuminate effect: gold spotlight blooms from center, image brightens, edge vignette opens, and an overlay panel rises fluidly with staggered text reveal.</div>
-    <div class="proto-tags">
-      <span class="tag">Fluid Cards</span>
-      <span class="tag">Gold Illuminate</span>
-      <span class="tag">Cinematic</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
+<!-- ── INTRO ANIMATION ── -->
+<div id="intro">
+  <div class="intro-glow"></div>
+  <img src="logo.png" alt="Mosaic Media Productions" class="intro-logo">
 </div>
 
-<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
-  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c9b99a;margin-bottom:0.5rem;">Round 3 — Refined Variations of Prototype C</div>
-  <div style="font-size:0.9rem;color:#555;">Mosaic hero + "Capturing Vision" + enhanced service cards with slideshows, 3D flips, and magazine layout.</div>
-</div>
-<div class="prototypes" style="margin-bottom:3rem;">
-  <a href="prototype-d-fluid-cards.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype D</div>
-    <div class="proto-title">Fluid Cards</div>
-    <div class="proto-desc">Service cards with auto-playing image slideshows (3 images per card, crossfade). Rounded corners throughout. Gold glow on hover. Expanding highlight reel. Dots indicate slideshow position.</div>
-    <div class="proto-tags">
-      <span class="tag">Slideshow Cards</span>
-      <span class="tag">Rounded</span>
-      <span class="tag">Gold Glow</span>
-      <span class="tag">Reel</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-  <a href="prototype-e-poster-flip.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype E</div>
-    <div class="proto-title">Poster Flip</div>
-    <div class="proto-desc">Service cards 3D flip on hover — front shows image + name, back reveals full description and CTA. Auto-cycling featured project showcase with arrow navigation. Tap to flip on mobile.</div>
-    <div class="proto-tags">
-      <span class="tag">3D Flip</span>
-      <span class="tag">Auto Showcase</span>
-      <span class="tag">Interactive</span>
-      <span class="tag">Cinematic</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-  <a href="prototype-f-magazine-grid.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype F</div>
-    <div class="proto-title">Magazine Grid</div>
-    <div class="proto-desc">Services in an asymmetric editorial magazine layout — varying tile sizes. Hover triggers a curtain reveal sliding up from the bottom. Rounded mosaic tiles in hero. Dual-row opposite-direction filmstrip reel.</div>
-    <div class="proto-tags">
-      <span class="tag">Magazine Layout</span>
-      <span class="tag">Curtain Reveal</span>
-      <span class="tag">Filmstrip Reel</span>
-      <span class="tag">Rounded Tiles</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
+<nav id="navbar">
+  <div class="nav-logo"><img src="logo.png" alt="Mosaic Media Productions"></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Our Work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get a Quote</a>
+  <button class="nav-burger" id="navBurger" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#work" onclick="closeMenu()">Our Work</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+  <a href="#contact" class="m-cta" onclick="closeMenu()">Get a Quote</a>
 </div>
 
-<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
-  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#0f87ff;margin-bottom:0.5rem;">Round 2 — Merged Concepts</div>
-  <div style="font-size:0.9rem;color:#555;">Combining your favorites: Cinematic Gold hero + Full Mosaic tiles + MV Staging's dark luxury style.</div>
-</div>
-<div class="prototypes" style="margin-bottom:3rem;">
-  <a href="prototype-a-mosaic-noir.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype A</div>
-    <div class="proto-title">Mosaic Noir</div>
-    <div class="proto-desc">Full-screen interactive mosaic hero with "Capturing Vision" headline. Dark luxury MV Staging aesthetic throughout. Gold accents, expandable service accordions, client logo marquee, 3D tilt portfolio.</div>
-    <div class="proto-tags">
-      <span class="tag">Mosaic Hero</span>
-      <span class="tag">Gold</span>
-      <span class="tag">Accordion</span>
-      <span class="tag">Marquee</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-  <a href="prototype-b-split-cinematic.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype B</div>
-    <div class="proto-title">Split Cinematic</div>
-    <div class="proto-desc">Split hero: animated mosaic tiles fill the left half, hero text and gold CTAs on the right. Bold numbered service cards, process steps, expandable accordions, and client marquee.</div>
-    <div class="proto-tags">
-      <span class="tag">Split Layout</span>
-      <span class="tag">Gold</span>
-      <span class="tag">Process Steps</span>
-      <span class="tag">Marquee</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-  <a href="prototype-c-editorial-dark.html" class="proto-card">
-    <div class="proto-num" style="color:#c9b99a;">Prototype C</div>
-    <div class="proto-title">Editorial Dark</div>
-    <div class="proto-desc">Full mosaic hero with large editorial uppercase type. MV Staging-style alternating text/image service rows. Production services grid, highlight reel, expandable accordions, and client marquee.</div>
-    <div class="proto-tags">
-      <span class="tag">Editorial Type</span>
-      <span class="tag">Alternating Rows</span>
-      <span class="tag">Reel</span>
-      <span class="tag">Marquee</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-</div>
 
-<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
-  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#555;margin-bottom:0.5rem;">Round 1 — Original Concepts</div>
-</div>
-<div class="prototypes">
-  <a href="prototype-1-cinematic.html" class="proto-card">
-    <div class="proto-num">Prototype 01</div>
-    <div class="proto-title">Cinematic Gold</div>
-    <div class="proto-desc">Dark, premium feel with warm gold accents. Floating mosaic tiles in the hero. Elegant typography. Classic production company aesthetic elevated with interactive mosaic elements.</div>
-    <div class="proto-tags">
-      <span class="tag">Dark Theme</span>
-      <span class="tag">Gold Accents</span>
-      <span class="tag">Mosaic Hero</span>
-      <span class="tag">Premium</span>
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-mosaic-grid" id="heroGrid"></div>
+  <div class="hero-editorial">
+    <h1>Mosaic<br><span class="line-gold">Media</span></h1>
+    <div class="hero-sub">Productions</div>
+    <div class="hero-divider"></div>
+    <p>Premium audio-visual production for brands, events, and creators — serving clients across the East Coast and beyond.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Start Your Project</a>
+      <a href="#services" class="btn-ghost">Explore Services</a>
     </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-arrow"></div></div>
+</section>
 
-  <a href="prototype-2-lumens-modern.html" class="proto-card">
-    <div class="proto-num">Prototype 02</div>
-    <div class="proto-title">Modern Blue</div>
-    <div class="proto-desc">Inspired by Lumens AV's clean aesthetic. Black/white/electric blue palette. Wave-animated mosaic hero, filterable portfolio grid, and a clear process section. Professional and tech-forward.</div>
-    <div class="proto-tags">
-      <span class="tag">Lumens-Style</span>
-      <span class="tag">Blue Accent</span>
-      <span class="tag">Clean Layout</span>
-      <span class="tag">Animated</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-
-  <a href="prototype-3-full-mosaic.html" class="proto-card">
-    <div class="proto-num">Prototype 03</div>
-    <div class="proto-title">Full Mosaic Experience</div>
-    <div class="proto-desc">The entire site IS a mosaic. Full-screen tile hero with pulsing animations. Click any service tile and it expands into a sub-mosaic. Horizontal reel scroll. The mosaic concept taken to the max.</div>
-    <div class="proto-tags">
-      <span class="tag">Interactive</span>
-      <span class="tag">Drill-Down</span>
-      <span class="tag">Full Experience</span>
-      <span class="tag">Bold</span>
-    </div>
-    <span class="proto-link">View Prototype &rarr;</span>
-  </a>
-</div>
-
-<div class="pointers">
-  <h2>Website <span>Improvement Pointers</span></h2>
-  <div class="pointer-grid">
-    <div class="pointer">
-      <span class="pointer-priority high">High Priority</span>
-      <h3>Add Real Portfolio Content</h3>
-      <p>The current site's portfolio page appears empty. Showcase 6-10 best projects with high-quality thumbnails, short descriptions, and embedded video. This is the #1 thing that converts visitors to clients. Use the mosaic grid concept to display them.</p>
-    </div>
-    <div class="pointer">
-      <span class="pointer-priority high">High Priority</span>
-      <h3>Clear Service Descriptions</h3>
-      <p>List every service with a brief description of what's included, who it's for, and a starting price range or "request a quote" CTA. Visitors should immediately understand what you offer and how to hire you.</p>
-    </div>
-    <div class="pointer">
-      <span class="pointer-priority high">High Priority</span>
-      <h3>Stronger Call-to-Action</h3>
-      <p>Add a prominent "Get a Quote" or "Book a Consultation" button in the hero, after every section, and in a sticky nav. Make it dead simple for someone to reach out. Include a contact form, not just an email link.</p>
-    </div>
-    <div class="pointer">
-      <span class="pointer-priority high">High Priority</span>
-      <h3>Social Proof & Testimonials</h3>
-      <p>Add client testimonials, logos of companies worked with, and stats (projects completed, years in business). Social proof builds trust instantly, especially for a service-based business.</p>
-    </div>
-    <div class="pointer">
-      <span class="pointer-priority med">Medium Priority</span>
-      <h3>SEO & Local Presence</h3>
-      <p>Target "AV production DMV", "video production DC", "event videographer Maryland" etc. Add location-specific content, a Google Business profile, and structured data markup. Most clients search locally.</p>
-    </div>
-    <div class="pointer">
-      <span class="pointer-priority med">Medium Priority</span>
-      <h3>Demo Reel / Video Hero</h3>
-      <p>As an AV company, your website MUST showcase your work immediately. Replace the static hero with a 30-60 second demo reel playing in the background or as a prominent embedded video. Show, don't tell.</p>
-    </div>
-    <div class="pointer">
-      <span class="pointer-priority med">Medium Priority</span>
-      <h3>Upgrade from Generic Theme</h3>
-      <p>The current Neve/WordPress theme is functional but generic. Consider a custom-built site (or premium theme customization) that matches the creative quality of the work you produce. Your website IS your first portfolio piece.</p>
-    </div>
-    <div class="pointer">
-      <span class="pointer-priority med">Medium Priority</span>
-      <h3>Speed & Mobile Optimization</h3>
-      <p>Ensure fast load times (under 3 seconds), especially on mobile. Compress images, use lazy loading, and test on real phones. Over 60% of visitors will come from mobile devices.</p>
-    </div>
+<!-- ── BRAND PILLARS ── -->
+<div class="stats">
+  <div class="stat reveal">
+    <div class="stat-icon">◈</div>
+    <div class="stat-num">Live Events</div>
+    <div class="stat-label">Audio-Visual Production</div>
+  </div>
+  <div class="stat reveal s1">
+    <div class="stat-icon">◈</div>
+    <div class="stat-num">Video & Film</div>
+    <div class="stat-label">Brand Storytelling</div>
+  </div>
+  <div class="stat reveal s2">
+    <div class="stat-icon">◈</div>
+    <div class="stat-num">Livestream</div>
+    <div class="stat-label">Broadcast Quality</div>
+  </div>
+  <div class="stat reveal s3">
+    <div class="stat-icon">◈</div>
+    <div class="stat-num">Photography</div>
+    <div class="stat-label">Visual Storytelling</div>
   </div>
 </div>
 
+<!-- ── ALTERNATING FLUID SERVICE ROWS ── -->
+<div class="services-section" id="services">
+
+  <!-- Row 1: Live Event AV — Image Left, Text Right -->
+  <div class="svc-row reveal">
+    <div class="fluid-panel">
+      <div class="fluid-bar"></div>
+      <img src="https://picsum.photos/seed/he1/900/600" alt="Live Event AV">
+    </div>
+    <div class="svc-text">
+      <div class="svc-text-num">01</div>
+      <div class="svc-text-label">Events</div>
+      <h3>Live Event AV</h3>
+      <p>End-to-end audio-visual production for conferences, galas, and corporate events. From LED walls and projection to wireless audio and live technical direction.</p>
+      <div class="svc-text-divider"></div>
+      <div class="svc-text-tags">
+        <span class="svc-tag">Conferences</span>
+        <span class="svc-tag">Galas</span>
+        <span class="svc-tag">Concerts</span>
+        <span class="svc-tag">Corporate</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Livestreaming — Text Left, Image Right -->
+  <div class="svc-row alt reveal">
+    <div class="fluid-panel">
+      <div class="fluid-bar"></div>
+      <img src="https://picsum.photos/seed/hs1/900/600" alt="Livestreaming">
+    </div>
+    <div class="svc-text">
+      <div class="svc-text-num">02</div>
+      <div class="svc-text-label">Streaming</div>
+      <h3>Livestreaming</h3>
+      <p>Studio-quality multi-camera livestreaming for virtual events, hybrid conferences, and social media broadcasts — delivered flawlessly every time.</p>
+      <div class="svc-text-divider"></div>
+      <div class="svc-text-tags">
+        <span class="svc-tag">Virtual Events</span>
+        <span class="svc-tag">Hybrid</span>
+        <span class="svc-tag">Social Media</span>
+        <span class="svc-tag">Webinars</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Video Production — Image Left, Text Right -->
+  <div class="svc-row reveal">
+    <div class="fluid-panel">
+      <div class="fluid-bar"></div>
+      <img src="https://picsum.photos/seed/hv1/900/600" alt="Video Production">
+    </div>
+    <div class="svc-text">
+      <div class="svc-text-num">03</div>
+      <div class="svc-text-label">Production</div>
+      <h3>Video Production</h3>
+      <p>Corporate videos, brand films, event coverage, and promotional content — crafted at cinematic quality for every screen and platform.</p>
+      <div class="svc-text-divider"></div>
+      <div class="svc-text-tags">
+        <span class="svc-tag">Brand Films</span>
+        <span class="svc-tag">Corporate</span>
+        <span class="svc-tag">Events</span>
+        <span class="svc-tag">Commercials</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Photography — Text Left, Image Right -->
+  <div class="svc-row alt reveal">
+    <div class="fluid-panel">
+      <div class="fluid-bar"></div>
+      <img src="https://picsum.photos/seed/hp1/900/600" alt="Photography">
+    </div>
+    <div class="svc-text">
+      <div class="svc-text-num">04</div>
+      <div class="svc-text-label">Photography</div>
+      <h3>Photography</h3>
+      <p>Event, portrait, and brand photography that tells your story visually. Every image gallery-ready and optimized for print, web, and social.</p>
+      <div class="svc-text-divider"></div>
+      <div class="svc-text-tags">
+        <span class="svc-tag">Events</span>
+        <span class="svc-tag">Portraits</span>
+        <span class="svc-tag">Product</span>
+        <span class="svc-tag">Lifestyle</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── CLIENT MARQUEE ── -->
+<div class="marquee-section">
+  <div class="marquee-label">Trusted By</div>
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- ── SIZZLE REEL ── -->
+<section class="reel-section" id="work">
+  <div class="reel-bg"></div>
+  <!-- Drop your sizzle reel here: <video autoplay muted loop playsinline class="reel-video"><source src="sizzle-reel.mp4" type="video/mp4"></video> -->
+  <div class="reel-scanlines"></div>
+  <div class="reel-vignette"></div>
+  <div class="reel-spotlight"></div>
+  <div class="reel-content">
+    <div class="reel-label">Sizzle Reel</div>
+    <div class="reel-title">Mosaic Media<br>Productions</div>
+  </div>
+  <div class="reel-corner">
+    <div class="reel-dot"></div>
+    <div class="reel-corner-text">Showreel 2026</div>
+  </div>
+  <div class="reel-cta-wrap">
+    <a href="#contact" class="reel-cta">Work With Us &rarr;</a>
+  </div>
+</section>
+
+<!-- ── ACCORDION ── -->
+<section class="acc-section" id="about">
+  <div style="max-width:800px">
+    <div class="reveal">
+      <div class="section-label">Deep Dive</div>
+      <h2 class="section-title">Every Service, In Detail</h2>
+    </div>
+    <div class="accordion reveal">
+      <div class="acc-item"><button class="acc-trigger"><h3>Live Event Audio-Visual</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Complete AV setup and technical direction — LED walls, projection, wireless audio systems, staging, and real-time management for conferences, galas, and corporate events of any size.</div></div></div>
+      <div class="acc-item"><button class="acc-trigger"><h3>Livestreaming &amp; Virtual Events</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Multi-camera broadcast-quality streaming for virtual conferences and hybrid events. Custom graphics packages, professional encoding, and flawless real-time delivery to any platform.</div></div></div>
+      <div class="acc-item"><button class="acc-trigger"><h3>Video Production &amp; Direction</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Full pipeline from scripting and storyboarding to final delivery. Cinema-grade cameras, professional lighting, and a creative team dedicated to your vision. Corporate films, documentaries, music videos, and commercials.</div></div></div>
+      <div class="acc-item"><button class="acc-trigger"><h3>Photography &amp; Visual Storytelling</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Professional event coverage, executive portraits, product photography, and brand lifestyle sessions. Gallery-ready images delivered optimized for web, print, and social media.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIAL ── -->
+<section class="testimonial">
+  <div class="reveal">
+    <div class="section-label">Client Words</div>
+    <blockquote>"Mosaic Media transformed our vision into something beyond what we imagined. Their attention to detail and creative direction elevated our entire brand."</blockquote>
+    <cite>Sarah Mitchell</cite>
+    <div class="cite-role">Marketing Director, TechStart DC</div>
+  </div>
+</section>
+
+<!-- ── CTA + CONTACT FORM ── -->
+<section class="cta-section" id="contact">
+  <div class="reveal">
+    <div class="section-label">Ready to Create?</div>
+    <h2 class="section-title">Let's Build Your Mosaic</h2>
+    <p class="section-desc">Every great production starts with a conversation. Tell us about your project — we'll handle the rest.</p>
+    <form class="contact-form" id="contactForm" novalidate>
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+      </div>
+      <select name="service">
+        <option value="" disabled selected>Service Type</option>
+        <option>Live Event AV</option>
+        <option>Livestreaming</option>
+        <option>Video Production</option>
+        <option>Photography</option>
+        <option>Multiple / Not Sure</option>
+      </select>
+      <textarea name="message" placeholder="Tell us about your project..." required></textarea>
+      <button type="submit" class="btn-form">Send Message</button>
+    </form>
+    <p class="form-success" id="formSuccess">Message received — we'll be in touch shortly.</p>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-brand">
+    <img src="logo.png" alt="Mosaic Media Productions">
+    <p>Full-service audio-visual production for brands, events, and creators. Headquartered in the DMV area, serving clients across the East Coast.</p>
+  </div>
+  <div class="footer-col"><h4>Services</h4><ul><li><a href="#">Live Event AV</a></li><li><a href="#">Livestreaming</a></li><li><a href="#">Video Production</a></li><li><a href="#">Photography</a></li></ul></div>
+  <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Portfolio</a></li><li><a href="#">Process</a></li><li><a href="#">Careers</a></li></ul></div>
+  <div class="footer-col"><h4>Connect</h4><ul><li><a href="mailto:info@mosaicmediaproductions.com">Email Us</a></li><li><a href="#">Instagram</a></li><li><a href="#">YouTube</a></li><li><a href="#">LinkedIn</a></li><li><a href="#">Facebook</a></li></ul></div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Mosaic Media Productions. All rights reserved.</span>
+    <div class="social"><a href="#">IG</a><a href="#">YT</a><a href="#">FB</a><a href="#">LI</a></div>
+  </div>
+</footer>
+
+<script>
+// ── INTRO ANIMATION ──
+(function(){
+  document.body.style.overflow = 'hidden';
+  const intro = document.getElementById('intro');
+  // Logo holds for ~2.2s, then fades out over 0.9s
+  setTimeout(() => {
+    intro.classList.add('exit');
+    setTimeout(() => {
+      intro.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 900);
+  }, 2200);
+})();
+
+// ── HERO MOSAIC ──
+const heroGrid = document.getElementById('heroGrid');
+const cols = window.innerWidth <= 640 ? 4 : window.innerWidth <= 1024 ? 6 : 10;
+const rows = window.innerWidth <= 640 ? 5 : 7;
+heroGrid.style.setProperty('--cols', cols);
+heroGrid.style.setProperty('--rows', rows);
+for (let i = 0; i < cols * rows; i++) {
+  const t = document.createElement('div');
+  t.className = 'hm-tile';
+  t.style.opacity = (.4 + Math.random() * .6).toFixed(2);
+  t.innerHTML = `<img src="https://picsum.photos/seed/hv${i}/150/150" alt="" loading="${i < 15 ? 'eager' : 'lazy'}">`;
+  heroGrid.appendChild(t);
+}
+const heroTiles = heroGrid.querySelectorAll('.hm-tile');
+setInterval(() => {
+  const idx = Math.floor(Math.random() * heroTiles.length);
+  heroTiles[idx].classList.add('pulse');
+  setTimeout(() => heroTiles[idx].classList.remove('pulse'), 2200);
+}, 450);
+
+// ── CLIENT MARQUEE ──
+const clients = ['EventCo NYC','Nexus Group','Capitol Media','Blue Ridge Weddings','TechStart DC','Union Stage','Arena Event Group','Howard University','National Harbor','Marriott Hotels','SmithGroup','Atlantic Productions'];
+const track = document.getElementById('marqueeTrack');
+const items = [...clients,...clients].map(c=>`<span class="marquee-item">${c}</span>`).join('<span class="marquee-item" style="color:#111">/</span>');
+track.innerHTML = items + items;
+
+// ── ACCORDION ──
+document.querySelectorAll('.acc-trigger').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.acc-item');
+    const body = item.querySelector('.acc-body');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.acc-item.open').forEach(o => { o.classList.remove('open'); o.querySelector('.acc-body').style.maxHeight = '0'; });
+    if (!isOpen) { item.classList.add('open'); body.style.maxHeight = body.scrollHeight + 'px'; }
+  });
+});
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: .06 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60));
+
+// ── MOBILE MENU ──
+const burger = document.getElementById('navBurger');
+const mobileMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+  document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+});
+function closeMenu() { burger.classList.remove('open'); mobileMenu.classList.remove('open'); document.body.style.overflow = ''; }
+
+// ── CONTACT FORM ──
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('[type="submit"]');
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  setTimeout(() => {
+    this.style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+    setTimeout(() => {
+      this.style.display = 'flex';
+      document.getElementById('formSuccess').style.display = 'none';
+      this.reset(); btn.textContent = 'Send Message'; btn.disabled = false;
+    }, 4000);
+  }, 800);
+});
+</script>
 </body>
 </html>
