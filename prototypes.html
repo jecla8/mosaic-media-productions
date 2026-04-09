@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mosaic Media Productions - Website Prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+  }
+  .logo { height: 40px; margin-bottom: 2rem; }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  h1 span { color: #0f87ff; }
+  .subtitle {
+    color: #666;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 4rem;
+    max-width: 500px;
+  }
+  .prototypes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1100px;
+    width: 100%;
+  }
+  .proto-card {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    padding: 2.5rem;
+    transition: all 0.4s;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+  .proto-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    transition: all 0.4s;
+  }
+  .proto-card:nth-child(1)::before { background: #c9b99a; transform: scaleX(0); }
+  .proto-card:nth-child(2)::before { background: #0f87ff; transform: scaleX(0); }
+  .proto-card:nth-child(3)::before { background: linear-gradient(90deg, #0f87ff, #c9b99a); transform: scaleX(0); }
+  .proto-card:hover::before { transform: scaleX(1); }
+  .proto-card:hover {
+    border-color: #333;
+    transform: translateY(-5px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .proto-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 1.5rem;
+  }
+  .proto-card:nth-child(1) .proto-num { color: #c9b99a; }
+  .proto-card:nth-child(2) .proto-num { color: #0f87ff; }
+  .proto-card:nth-child(3) .proto-num { color: #a090ff; }
+  .proto-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+  .proto-desc {
+    color: #888;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  .proto-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .tag {
+    padding: 0.3rem 0.7rem;
+    background: #1a1a1a;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #666;
+  }
+  .proto-link {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #555;
+    transition: color 0.3s;
+  }
+  .proto-card:hover .proto-link { color: #fff; }
+  .pointers {
+    max-width: 1100px;
+    width: 100%;
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 1px solid #1a1a1a;
+  }
+  .pointers h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+  }
+  .pointers h2 span { color: #0f87ff; }
+  .pointer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  .pointer {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    padding: 2rem;
+  }
+  .pointer-priority {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .high { background: rgba(217,79,79,0.15); color: #d94f4f; }
+  .med { background: rgba(255,165,0,0.15); color: orange; }
+  .pointer h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .pointer p { color: #888; font-size: 0.85rem; line-height: 1.7; }
+  @media (max-width: 768px) {
+    .prototypes, .pointer-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<img src="logo.png" alt="Mosaic Media" class="logo">
+<h1>Website <span>Prototypes</span></h1>
+<p class="subtitle">Six design directions for MosaicMediaProductions.com. Click to view each prototype.</p>
+
+<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
+  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c9b99a;margin-bottom:0.5rem;">Round 4 — Combined Concepts, Refined</div>
+  <div style="font-size:0.9rem;color:#555;">Alternating rows + "Mosaic Vision" headline + East Coast positioning. Two card interaction styles to compare.</div>
+</div>
+<div class="prototypes" style="margin-bottom:3rem;">
+  <a href="prototype-g-mosaic-vision.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype G</div>
+    <div class="proto-title">Mosaic Vision — Flip</div>
+    <div class="proto-desc">Alternating text/image rows combined with 3D flip cards. Hover the image panel to rotate 180° and reveal service description + CTA. "Mosaic Vision" headline. East Coast positioning.</div>
+    <div class="proto-tags">
+      <span class="tag">3D Flip</span>
+      <span class="tag">Alternating Rows</span>
+      <span class="tag">Mosaic Vision</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+  <a href="prototype-h-fluid-illuminate.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype H</div>
+    <div class="proto-title">Mosaic Vision — Illuminate</div>
+    <div class="proto-desc">Same alternating rows, but hover triggers a cinematic illuminate effect: gold spotlight blooms from center, image brightens, edge vignette opens, and an overlay panel rises fluidly with staggered text reveal.</div>
+    <div class="proto-tags">
+      <span class="tag">Fluid Cards</span>
+      <span class="tag">Gold Illuminate</span>
+      <span class="tag">Cinematic</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+</div>
+
+<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
+  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#c9b99a;margin-bottom:0.5rem;">Round 3 — Refined Variations of Prototype C</div>
+  <div style="font-size:0.9rem;color:#555;">Mosaic hero + "Capturing Vision" + enhanced service cards with slideshows, 3D flips, and magazine layout.</div>
+</div>
+<div class="prototypes" style="margin-bottom:3rem;">
+  <a href="prototype-d-fluid-cards.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype D</div>
+    <div class="proto-title">Fluid Cards</div>
+    <div class="proto-desc">Service cards with auto-playing image slideshows (3 images per card, crossfade). Rounded corners throughout. Gold glow on hover. Expanding highlight reel. Dots indicate slideshow position.</div>
+    <div class="proto-tags">
+      <span class="tag">Slideshow Cards</span>
+      <span class="tag">Rounded</span>
+      <span class="tag">Gold Glow</span>
+      <span class="tag">Reel</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+  <a href="prototype-e-poster-flip.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype E</div>
+    <div class="proto-title">Poster Flip</div>
+    <div class="proto-desc">Service cards 3D flip on hover — front shows image + name, back reveals full description and CTA. Auto-cycling featured project showcase with arrow navigation. Tap to flip on mobile.</div>
+    <div class="proto-tags">
+      <span class="tag">3D Flip</span>
+      <span class="tag">Auto Showcase</span>
+      <span class="tag">Interactive</span>
+      <span class="tag">Cinematic</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+  <a href="prototype-f-magazine-grid.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype F</div>
+    <div class="proto-title">Magazine Grid</div>
+    <div class="proto-desc">Services in an asymmetric editorial magazine layout — varying tile sizes. Hover triggers a curtain reveal sliding up from the bottom. Rounded mosaic tiles in hero. Dual-row opposite-direction filmstrip reel.</div>
+    <div class="proto-tags">
+      <span class="tag">Magazine Layout</span>
+      <span class="tag">Curtain Reveal</span>
+      <span class="tag">Filmstrip Reel</span>
+      <span class="tag">Rounded Tiles</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+</div>
+
+<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
+  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#0f87ff;margin-bottom:0.5rem;">Round 2 — Merged Concepts</div>
+  <div style="font-size:0.9rem;color:#555;">Combining your favorites: Cinematic Gold hero + Full Mosaic tiles + MV Staging's dark luxury style.</div>
+</div>
+<div class="prototypes" style="margin-bottom:3rem;">
+  <a href="prototype-a-mosaic-noir.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype A</div>
+    <div class="proto-title">Mosaic Noir</div>
+    <div class="proto-desc">Full-screen interactive mosaic hero with "Capturing Vision" headline. Dark luxury MV Staging aesthetic throughout. Gold accents, expandable service accordions, client logo marquee, 3D tilt portfolio.</div>
+    <div class="proto-tags">
+      <span class="tag">Mosaic Hero</span>
+      <span class="tag">Gold</span>
+      <span class="tag">Accordion</span>
+      <span class="tag">Marquee</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+  <a href="prototype-b-split-cinematic.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype B</div>
+    <div class="proto-title">Split Cinematic</div>
+    <div class="proto-desc">Split hero: animated mosaic tiles fill the left half, hero text and gold CTAs on the right. Bold numbered service cards, process steps, expandable accordions, and client marquee.</div>
+    <div class="proto-tags">
+      <span class="tag">Split Layout</span>
+      <span class="tag">Gold</span>
+      <span class="tag">Process Steps</span>
+      <span class="tag">Marquee</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+  <a href="prototype-c-editorial-dark.html" class="proto-card">
+    <div class="proto-num" style="color:#c9b99a;">Prototype C</div>
+    <div class="proto-title">Editorial Dark</div>
+    <div class="proto-desc">Full mosaic hero with large editorial uppercase type. MV Staging-style alternating text/image service rows. Production services grid, highlight reel, expandable accordions, and client marquee.</div>
+    <div class="proto-tags">
+      <span class="tag">Editorial Type</span>
+      <span class="tag">Alternating Rows</span>
+      <span class="tag">Reel</span>
+      <span class="tag">Marquee</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+</div>
+
+<div style="width:100%;max-width:1100px;text-align:left;margin-bottom:1rem;">
+  <div style="font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#555;margin-bottom:0.5rem;">Round 1 — Original Concepts</div>
+</div>
+<div class="prototypes">
+  <a href="prototype-1-cinematic.html" class="proto-card">
+    <div class="proto-num">Prototype 01</div>
+    <div class="proto-title">Cinematic Gold</div>
+    <div class="proto-desc">Dark, premium feel with warm gold accents. Floating mosaic tiles in the hero. Elegant typography. Classic production company aesthetic elevated with interactive mosaic elements.</div>
+    <div class="proto-tags">
+      <span class="tag">Dark Theme</span>
+      <span class="tag">Gold Accents</span>
+      <span class="tag">Mosaic Hero</span>
+      <span class="tag">Premium</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+
+  <a href="prototype-2-lumens-modern.html" class="proto-card">
+    <div class="proto-num">Prototype 02</div>
+    <div class="proto-title">Modern Blue</div>
+    <div class="proto-desc">Inspired by Lumens AV's clean aesthetic. Black/white/electric blue palette. Wave-animated mosaic hero, filterable portfolio grid, and a clear process section. Professional and tech-forward.</div>
+    <div class="proto-tags">
+      <span class="tag">Lumens-Style</span>
+      <span class="tag">Blue Accent</span>
+      <span class="tag">Clean Layout</span>
+      <span class="tag">Animated</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+
+  <a href="prototype-3-full-mosaic.html" class="proto-card">
+    <div class="proto-num">Prototype 03</div>
+    <div class="proto-title">Full Mosaic Experience</div>
+    <div class="proto-desc">The entire site IS a mosaic. Full-screen tile hero with pulsing animations. Click any service tile and it expands into a sub-mosaic. Horizontal reel scroll. The mosaic concept taken to the max.</div>
+    <div class="proto-tags">
+      <span class="tag">Interactive</span>
+      <span class="tag">Drill-Down</span>
+      <span class="tag">Full Experience</span>
+      <span class="tag">Bold</span>
+    </div>
+    <span class="proto-link">View Prototype &rarr;</span>
+  </a>
+</div>
+
+<div class="pointers">
+  <h2>Website <span>Improvement Pointers</span></h2>
+  <div class="pointer-grid">
+    <div class="pointer">
+      <span class="pointer-priority high">High Priority</span>
+      <h3>Add Real Portfolio Content</h3>
+      <p>The current site's portfolio page appears empty. Showcase 6-10 best projects with high-quality thumbnails, short descriptions, and embedded video. This is the #1 thing that converts visitors to clients. Use the mosaic grid concept to display them.</p>
+    </div>
+    <div class="pointer">
+      <span class="pointer-priority high">High Priority</span>
+      <h3>Clear Service Descriptions</h3>
+      <p>List every service with a brief description of what's included, who it's for, and a starting price range or "request a quote" CTA. Visitors should immediately understand what you offer and how to hire you.</p>
+    </div>
+    <div class="pointer">
+      <span class="pointer-priority high">High Priority</span>
+      <h3>Stronger Call-to-Action</h3>
+      <p>Add a prominent "Get a Quote" or "Book a Consultation" button in the hero, after every section, and in a sticky nav. Make it dead simple for someone to reach out. Include a contact form, not just an email link.</p>
+    </div>
+    <div class="pointer">
+      <span class="pointer-priority high">High Priority</span>
+      <h3>Social Proof & Testimonials</h3>
+      <p>Add client testimonials, logos of companies worked with, and stats (projects completed, years in business). Social proof builds trust instantly, especially for a service-based business.</p>
+    </div>
+    <div class="pointer">
+      <span class="pointer-priority med">Medium Priority</span>
+      <h3>SEO & Local Presence</h3>
+      <p>Target "AV production DMV", "video production DC", "event videographer Maryland" etc. Add location-specific content, a Google Business profile, and structured data markup. Most clients search locally.</p>
+    </div>
+    <div class="pointer">
+      <span class="pointer-priority med">Medium Priority</span>
+      <h3>Demo Reel / Video Hero</h3>
+      <p>As an AV company, your website MUST showcase your work immediately. Replace the static hero with a 30-60 second demo reel playing in the background or as a prominent embedded video. Show, don't tell.</p>
+    </div>
+    <div class="pointer">
+      <span class="pointer-priority med">Medium Priority</span>
+      <h3>Upgrade from Generic Theme</h3>
+      <p>The current Neve/WordPress theme is functional but generic. Consider a custom-built site (or premium theme customization) that matches the creative quality of the work you produce. Your website IS your first portfolio piece.</p>
+    </div>
+    <div class="pointer">
+      <span class="pointer-priority med">Medium Priority</span>
+      <h3>Speed & Mobile Optimization</h3>
+      <p>Ensure fast load times (under 3 seconds), especially on mobile. Compress images, use lazy loading, and test on real phones. Over 60% of visitors will come from mobile devices.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
