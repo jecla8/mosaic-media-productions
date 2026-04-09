@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mosaic Media – Prototype A: Mosaic Noir</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #000;
+  --white: #fff;
+  --gold: #c9b99a;
+  --gold-dim: rgba(201,185,154,0.15);
+  --border: #1c1c1c;
+  --text-muted: #777;
+  --btn-bg: rgba(255,255,255,0.10);
+  --btn-bg-hover: rgba(255,255,255,0.18);
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); overflow-x: hidden; }
+
+/* SCROLL REVEAL */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1); }
+.reveal.vis { opacity: 1; transform: none; }
+.reveal-left { opacity: 0; transform: translateX(-50px); transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1); }
+.reveal-left.vis { opacity: 1; transform: none; }
+.reveal-right { opacity: 0; transform: translateX(50px); transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1); }
+.reveal-right.vis { opacity: 1; transform: none; }
+.stagger-1 { transition-delay: 0.06s; }
+.stagger-2 { transition-delay: 0.12s; }
+.stagger-3 { transition-delay: 0.18s; }
+.stagger-4 { transition-delay: 0.24s; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.2rem 4rem;
+  background: rgba(0,0,0,0.88); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: padding 0.4s;
+}
+nav.scrolled { padding: 0.75rem 4rem; }
+.nav-logo img { height: 34px; }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a { font-size: 0.75rem; font-weight: 500; color: #aaa; text-decoration: none; letter-spacing: 1px; text-transform: uppercase; transition: color 0.3s; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  padding: 0.6rem 1.6rem;
+  background: var(--btn-bg);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--white); font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; text-decoration: none;
+  transition: all 0.3s; backdrop-filter: blur(10px);
+}
+.nav-cta:hover { background: var(--btn-bg-hover); }
+
+/* MOBILE NAV */
+.nav-burger { display: none; background: none; border: none; cursor: pointer; padding: 0.4rem; flex-direction: column; gap: 5px; z-index: 1100; }
+.nav-burger span { display: block; width: 22px; height: 2px; background: #fff; transition: all 0.3s; }
+.nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-burger.open span:nth-child(2) { opacity: 0; }
+.nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+.mobile-menu.open { display: flex; }
+.mobile-menu a { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: #fff; transition: color 0.3s; font-family: 'Bricolage Grotesque', sans-serif; }
+.mobile-menu a:hover { color: var(--gold); }
+.mobile-menu .m-cta { margin-top: 1rem; padding: 0.9rem 2.5rem; background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.2); font-size: 0.8rem; }
+@media (max-width: 640px) { .nav-burger { display: flex; } .nav-cta { display: none; } nav { padding: 1rem 1.5rem; } }
+
+/* HERO – FULL MOSAIC BACKGROUND */
+.hero {
+  height: 100vh; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-mosaic-grid {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 10), 1fr);
+  grid-template-rows: repeat(var(--rows, 7), 1fr);
+  gap: 3px; padding: 3px;
+}
+.hm-tile {
+  position: relative; cursor: pointer; overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.hm-tile img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(60%) brightness(0.35);
+  transition: all 0.6s;
+}
+.hm-tile::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(0,0,0,0.35); transition: all 0.4s;
+}
+.hm-tile:hover { z-index: 10; transform: scale(1.06); }
+.hm-tile:hover img { filter: grayscale(0%) brightness(0.9); }
+.hm-tile:hover::after { background: rgba(201,185,154,0.12); }
+.hm-tile.pulse img { filter: grayscale(30%) brightness(0.5); }
+
+.hero-overlay {
+  position: relative; z-index: 20; text-align: center;
+  pointer-events: none; max-width: 900px; padding: 0 2rem;
+}
+.hero-overlay * { pointer-events: auto; }
+.hero-tag {
+  display: inline-block; margin-bottom: 1.8rem;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+}
+.hero-overlay h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(3rem, 7vw, 6.5rem); font-weight: 800; line-height: 1.0;
+  letter-spacing: -2px; margin-bottom: 1.5rem;
+  text-shadow: 0 4px 60px rgba(0,0,0,0.9);
+  opacity: 0; animation: fadeUp 0.9s 0.4s forwards;
+}
+.hero-overlay h1 em { font-style: normal; color: var(--gold); }
+.hero-sub {
+  font-size: 1.05rem; color: #aaa; max-width: 480px; margin: 0 auto 2.5rem; line-height: 1.8;
+  opacity: 0; animation: fadeUp 0.9s 0.6s forwards;
+}
+.hero-btns {
+  display: flex; gap: 1rem; justify-content: center;
+  opacity: 0; animation: fadeUp 0.9s 0.8s forwards;
+}
+.btn-primary {
+  padding: 1rem 2.5rem;
+  background: var(--btn-bg);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--white); font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; text-decoration: none;
+  backdrop-filter: blur(12px); transition: all 0.3s;
+  background-image: conic-gradient(from 90deg at 50% 50%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0) 100%);
+}
+.btn-primary:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+.btn-secondary {
+  padding: 1rem 2.5rem; background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #aaa; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; text-decoration: none; transition: all 0.3s;
+}
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+.scroll-hint {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  opacity: 0; animation: fadeIn 1s 1.8s forwards;
+}
+.scroll-hint span { font-size: 0.6rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #444; }
+.scroll-arrow { width: 18px; height: 18px; border-right: 1px solid #444; border-bottom: 1px solid #444; transform: rotate(45deg); animation: bounce 2s infinite; }
+
+/* STATS */
+.stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.stat { padding: 2.5rem; text-align: center; border-right: 1px solid var(--border); }
+.stat:last-child { border-right: none; }
+.stat-num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--gold); }
+.stat-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-top: 0.4rem; }
+@media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(2) { border-right: none; } }
+
+/* SECTIONS */
+section { padding: 7rem 4rem; }
+@media (max-width: 768px) { section { padding: 5rem 1.5rem; } }
+.section-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+.section-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; }
+.section-desc { color: var(--text-muted); font-size: 1rem; line-height: 1.8; max-width: 520px; }
+
+/* PRODUCTION SERVICES GRID */
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 4rem; background: var(--border); }
+.svc-card {
+  background: var(--black); padding: 2.5rem; position: relative; overflow: hidden;
+  cursor: pointer; transition: background 0.4s;
+}
+.svc-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px; background: var(--gold); transition: width 0.5s; }
+.svc-card:hover::after { width: 100%; }
+.svc-card:hover { background: #0a0a0a; }
+.svc-img { width: 100%; height: 160px; object-fit: cover; margin-bottom: 1.5rem; filter: grayscale(40%) brightness(0.75); transition: all 0.5s; }
+.svc-card:hover .svc-img { filter: grayscale(0%) brightness(1); }
+.svc-num { font-size: 0.65rem; font-weight: 700; color: var(--gold); letter-spacing: 2px; margin-bottom: 0.8rem; }
+.svc-card h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.7rem; }
+.svc-card p { color: var(--text-muted); font-size: 0.875rem; line-height: 1.7; }
+@media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .services-grid { grid-template-columns: 1fr; } }
+
+/* CLIENT MARQUEE */
+.marquee-section { padding: 3rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
+.marquee-label { text-align: center; font-size: 0.6rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: #444; margin-bottom: 2rem; }
+.marquee-track { display: flex; gap: 0; animation: marquee 30s linear infinite; width: max-content; }
+.marquee-track:hover { animation-play-state: paused; }
+.marquee-item {
+  padding: 0 3rem; font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.9rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: #333; white-space: nowrap; transition: color 0.3s; cursor: default;
+}
+.marquee-item:hover { color: var(--gold); }
+.marquee-divider { color: #1a1a1a; padding: 0 1rem; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* EXPANDABLE SERVICES */
+.accordion { margin-top: 3rem; }
+.acc-item { border-bottom: 1px solid var(--border); }
+.acc-trigger {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 1.5rem 0; background: none; border: none; color: var(--white);
+  cursor: pointer; transition: all 0.3s; text-align: left;
+}
+.acc-trigger:hover { color: var(--gold); }
+.acc-trigger h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 600; }
+.acc-icon { width: 28px; height: 28px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.4s; }
+.acc-icon::before, .acc-icon::after { content: ''; position: absolute; background: var(--white); transition: all 0.3s; }
+.acc-icon { position: relative; }
+.acc-icon::before { width: 12px; height: 1px; }
+.acc-icon::after { width: 1px; height: 12px; }
+.acc-item.open .acc-icon { border-color: var(--gold); transform: rotate(45deg); }
+.acc-item.open .acc-icon::before, .acc-item.open .acc-icon::after { background: var(--gold); }
+.acc-body { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.16,1,0.3,1); }
+.acc-body-inner { padding: 0 0 1.5rem; color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; max-width: 600px; }
+
+/* PORTFOLIO MOSAIC */
+.portfolio-mosaic {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 140px; gap: 4px; margin-top: 4rem; perspective: 1000px;
+}
+.pm-tile { position: relative; overflow: hidden; cursor: pointer; transition: all 0.5s cubic-bezier(0.25,0.46,0.45,0.94); transform-style: preserve-3d; border-radius: 2px; }
+.pm-tile:hover { z-index: 20; box-shadow: 0 20px 60px rgba(201,185,154,0.15); }
+.pm-tile img { width: 100%; height: 100%; object-fit: cover; transition: all 0.6s; filter: grayscale(40%) brightness(0.65); }
+.pm-tile:hover img { filter: grayscale(0%) brightness(1); transform: scale(1.08); }
+.pm-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.85) 100%); opacity: 0; transition: opacity 0.4s; }
+.pm-tile:hover .pm-overlay { opacity: 1; }
+.pm-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 1.2rem; z-index: 2; opacity: 0; transform: translateY(10px); transition: all 0.4s; }
+.pm-tile:hover .pm-info { opacity: 1; transform: none; }
+.pm-cat { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+.pm-title { font-size: 0.9rem; font-weight: 700; margin-top: 0.2rem; }
+.pm-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.6); width: 52px; height: 52px; border: 1px solid rgba(255,255,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.5s; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
+.pm-tile:hover .pm-play { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+.pm-play::after { content: ''; border-left: 9px solid white; border-top: 5px solid transparent; border-bottom: 5px solid transparent; margin-left: 3px; }
+.pm-large { grid-column: span 3; grid-row: span 2; }
+.pm-med { grid-column: span 2; grid-row: span 2; }
+.pm-tall { grid-column: span 1; grid-row: span 2; }
+.pm-wide { grid-column: span 3; grid-row: span 1; }
+.pm-sm { grid-column: span 1; grid-row: span 1; }
+@media (max-width: 1024px) { .portfolio-mosaic { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 120px; } .pm-large { grid-column: span 2; } }
+@media (max-width: 640px) { .portfolio-mosaic { grid-template-columns: repeat(2, 1fr); } .pm-large, .pm-med, .pm-wide { grid-column: span 2; } }
+
+/* TESTIMONIAL */
+.testimonial { text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 6rem 4rem; }
+.testimonial blockquote { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.2rem, 2.5vw, 1.7rem); font-weight: 300; max-width: 720px; margin: 1.5rem auto; line-height: 1.7; color: #ccc; font-style: italic; }
+.testimonial cite { font-style: normal; font-size: 0.75rem; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+.testimonial .cite-role { font-size: 0.7rem; color: #555; margin-top: 0.3rem; }
+
+/* CTA + FORM */
+.cta-section { text-align: center; padding: 7rem 4rem; }
+.cta-section .section-desc { margin: 0 auto 3rem; }
+.contact-form { max-width: 580px; margin: 0 auto; text-align: left; display: flex; flex-direction: column; gap: 1rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.contact-form input, .contact-form textarea, .contact-form select {
+  width: 100%; padding: 0.95rem 1.2rem;
+  background: rgba(255,255,255,0.04); border: 1px solid #2a2a2a;
+  color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+  outline: none; transition: border-color 0.3s;
+}
+.contact-form input::placeholder, .contact-form textarea::placeholder { color: #555; }
+.contact-form select option { background: #111; }
+.contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus { border-color: var(--gold); }
+.contact-form textarea { resize: vertical; min-height: 120px; }
+.btn-form { width: 100%; padding: 1rem; background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(10px); }
+.btn-form:hover { background: var(--btn-bg-hover); }
+.form-success { display: none; text-align: center; color: var(--gold); font-weight: 600; letter-spacing: 1px; font-size: 0.9rem; }
+@media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } .cta-section { padding: 5rem 1.5rem; } }
+
+/* FOOTER */
+footer { padding: 4rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; }
+.footer-brand img { height: 30px; margin-bottom: 1rem; }
+.footer-brand p { color: #555; font-size: 0.85rem; line-height: 1.7; }
+.footer-col h4 { font-size: 0.65rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem; }
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 0.6rem; }
+.footer-col a { color: #555; text-decoration: none; font-size: 0.85rem; transition: color 0.3s; }
+.footer-col a:hover { color: var(--white); }
+.footer-bottom { grid-column: 1/-1; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.footer-bottom span { font-size: 0.7rem; color: #444; }
+.social { display: flex; gap: 0.8rem; }
+.social a { width: 34px; height: 34px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: #555; text-decoration: none; font-size: 0.75rem; font-weight: 700; transition: all 0.3s; }
+.social a:hover { border-color: var(--gold); color: var(--gold); }
+@media (max-width: 1024px) { footer { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { footer { grid-template-columns: 1fr; padding: 3rem 1.5rem; } }
+
+/* BACK LINK */
+.back-link { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 900; padding: 0.55rem 1.1rem; background: rgba(0,0,0,0.85); border: 1px solid #2a2a2a; color: #666; font-size: 0.65rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; backdrop-filter: blur(10px); transition: all 0.3s; }
+.back-link:hover { border-color: var(--gold); color: var(--gold); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bounce { 0%,100% { transform: rotate(45deg) translate(0); } 50% { transform: rotate(45deg) translate(5px,5px); } }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-logo"><img src="logo.png" alt="Mosaic Media Productions"></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get a Quote</a>
+  <button class="nav-burger" id="navBurger" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#portfolio" onclick="closeMenu()">Portfolio</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+  <a href="#contact" class="m-cta" onclick="closeMenu()">Get a Quote</a>
+</div>
+
+<a href="index.html" class="back-link">&larr; All Prototypes</a>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-mosaic-grid" id="heroGrid"></div>
+  <div class="hero-overlay">
+    <div class="hero-tag">DMV's Premier AV Production Studio</div>
+    <h1>Capturing Vision<br>Through <em>Lens &amp; Sound</em></h1>
+    <p class="hero-sub">Premium audio-visual production for brands, events, and creators. Every piece of your story, assembled into something extraordinary.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Start Your Project</a>
+      <a href="#portfolio" class="btn-secondary">View Our Work</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-arrow"></div></div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num" data-target="150">0+</div><div class="stat-label">Projects Delivered</div></div>
+  <div class="stat reveal stagger-1"><div class="stat-num" data-target="50">0+</div><div class="stat-label">Happy Clients</div></div>
+  <div class="stat reveal stagger-2"><div class="stat-num" data-target="5">0+</div><div class="stat-label">Years Experience</div></div>
+  <div class="stat reveal stagger-3"><div class="stat-num">DMV</div><div class="stat-label">DC · MD · VA</div></div>
+</div>
+
+<!-- PRODUCTION SERVICES -->
+<section id="services">
+  <div class="reveal">
+    <div class="section-label">What We Do</div>
+    <h2 class="section-title">Production Services</h2>
+    <p class="section-desc">End-to-end media production crafted to elevate your brand story.</p>
+  </div>
+  <div class="services-grid">
+    <div class="svc-card reveal stagger-1"><img class="svc-img" src="https://picsum.photos/seed/cam-a1/600/300" alt="Video"><div class="svc-num">01</div><h3>Video Production</h3><p>Corporate videos, brand films, event coverage, and promotional content shot in cinematic quality.</p></div>
+    <div class="svc-card reveal stagger-2"><img class="svc-img" src="https://picsum.photos/seed/photo-a2/600/300" alt="Photo"><div class="svc-num">02</div><h3>Photography</h3><p>Professional event, headshot, product, and brand photography that tells your story visually.</p></div>
+    <div class="svc-card reveal stagger-3"><img class="svc-img" src="https://picsum.photos/seed/audio-a3/600/300" alt="Audio"><div class="svc-num">03</div><h3>Audio Production</h3><p>Crystal-clear audio for podcasts, voice-overs, live events, and multimedia projects.</p></div>
+    <div class="svc-card reveal stagger-1"><img class="svc-img" src="https://picsum.photos/seed/event-a4/600/300" alt="Events"><div class="svc-num">04</div><h3>Live Event AV</h3><p>Complete audio-visual setup for conferences, galas, concerts, and corporate events.</p></div>
+    <div class="svc-card reveal stagger-2"><img class="svc-img" src="https://picsum.photos/seed/edit-a5/600/300" alt="Post"><div class="svc-num">05</div><h3>Post-Production</h3><p>Expert editing, color grading, motion graphics, and sound design for polished final output.</p></div>
+    <div class="svc-card reveal stagger-3"><img class="svc-img" src="https://picsum.photos/seed/stream-a6/600/300" alt="Stream"><div class="svc-num">06</div><h3>Livestreaming</h3><p>Multi-camera live streaming for virtual events and social media with studio-quality production.</p></div>
+  </div>
+</section>
+
+<!-- CLIENT MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-label">Trusted By</div>
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- ACCORDION / EXPANDED SERVICES -->
+<section id="about" style="padding-top: 5rem; padding-bottom: 5rem;">
+  <div style="max-width: 800px; margin: 0 auto;">
+    <div class="reveal">
+      <div class="section-label">Deep Dive</div>
+      <h2 class="section-title">Every Service, In Detail</h2>
+    </div>
+    <div class="accordion reveal" style="margin-top: 3rem;">
+      <div class="acc-item">
+        <button class="acc-trigger"><h3>Video Production &amp; Direction</h3><span class="acc-icon"></span></button>
+        <div class="acc-body"><div class="acc-body-inner">From scripting and storyboarding to final delivery, we handle the full production pipeline. Cinema-quality cameras, professional lighting, and a creative team dedicated to your vision. Corporate films, documentaries, music videos, and commercials.</div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger"><h3>Photography &amp; Visual Storytelling</h3><span class="acc-icon"></span></button>
+        <div class="acc-body"><div class="acc-body-inner">Professional event coverage, executive portraits, product photography, and brand lifestyle sessions. We deliver gallery-ready images optimized for web, print, and social media at full resolution.</div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger"><h3>Live Event Audio-Visual</h3><span class="acc-icon"></span></button>
+        <div class="acc-body"><div class="acc-body-inner">Complete AV setup and technical direction for conferences, galas, award shows, and corporate events. We handle everything from LED walls and projection to wireless audio systems, staging, and real-time technical management.</div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger"><h3>Livestreaming &amp; Virtual Events</h3><span class="acc-icon"></span></button>
+        <div class="acc-body"><div class="acc-body-inner">Multi-camera broadcast-quality livestreaming for virtual conferences, hybrid events, social media, and webinars. We provide professional encoding, graphics packages, and real-time monitoring for flawless delivery.</div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger"><h3>Post-Production &amp; Finishing</h3><span class="acc-icon"></span></button>
+        <div class="acc-body"><div class="acc-body-inner">Professional editing, color grading, motion graphics, VFX, and audio mastering. We deliver broadcast-ready content in any format — web, broadcast, social, or archive — with unlimited revision rounds until you're satisfied.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" style="background: #050505;">
+  <div class="reveal" style="margin-bottom: 3rem;">
+    <div class="section-label">Selected Work</div>
+    <h2 class="section-title">The Mosaic</h2>
+    <p class="section-desc">Every piece of work is part of a larger picture.</p>
+  </div>
+  <div class="portfolio-mosaic" id="portfolioMosaic">
+    <div class="pm-tile pm-large reveal"><img src="https://picsum.photos/seed/pa-p1/800/600" alt=""><div class="pm-play"></div><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">Corporate Film</span><div class="pm-title">Tech Startup Brand Story</div></div></div>
+    <div class="pm-tile pm-tall"><img src="https://picsum.photos/seed/pa-p2/400/800" alt=""><div class="pm-play"></div><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">Music Video</span><div class="pm-title">Independent Artist</div></div></div>
+    <div class="pm-tile pm-med"><img src="https://picsum.photos/seed/pa-p3/600/500" alt=""><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">Event Coverage</span><div class="pm-title">Annual Nonprofit Gala</div></div></div>
+    <div class="pm-tile pm-sm"><img src="https://picsum.photos/seed/pa-p4/300/300" alt=""><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">Photo</span><div class="pm-title">Headshots</div></div></div>
+    <div class="pm-tile pm-sm"><img src="https://picsum.photos/seed/pa-p5/300/300" alt=""><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">AV</span><div class="pm-title">Conference</div></div></div>
+    <div class="pm-tile pm-wide"><img src="https://picsum.photos/seed/pa-p6/900/300" alt=""><div class="pm-play"></div><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">Commercial</span><div class="pm-title">Lifestyle Brand Launch</div></div></div>
+    <div class="pm-tile pm-sm"><img src="https://picsum.photos/seed/pa-p7/300/300" alt=""><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">Audio</span><div class="pm-title">Podcast Studio</div></div></div>
+    <div class="pm-tile pm-sm"><img src="https://picsum.photos/seed/pa-p8/300/300" alt=""><div class="pm-overlay"></div><div class="pm-info"><span class="pm-cat">Stream</span><div class="pm-title">Hybrid Summit</div></div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial">
+  <div class="reveal">
+    <div class="section-label">Client Words</div>
+    <blockquote>"Mosaic Media transformed our vision into something beyond what we imagined. Their attention to detail and creative direction elevated our entire brand."</blockquote>
+    <cite>Sarah Mitchell</cite>
+    <div class="cite-role">Marketing Director, TechStart DC</div>
+  </div>
+</section>
+
+<!-- CTA + CONTACT FORM -->
+<section class="cta-section" id="contact">
+  <div class="reveal">
+    <div class="section-label">Ready to Create?</div>
+    <h2 class="section-title">Let's Bring Your Vision to Life</h2>
+    <p class="section-desc">Tell us about your project. We'll craft a custom production plan that fits your goals and budget.</p>
+    <form class="contact-form" id="contactForm" novalidate>
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+      </div>
+      <select name="service"><option value="" disabled selected>Service Type</option><option>Video Production</option><option>Photography</option><option>Audio Production</option><option>Live Event AV</option><option>Livestreaming</option><option>Post-Production</option><option>Multiple / Not Sure</option></select>
+      <textarea name="message" placeholder="Tell us about your project..." required></textarea>
+      <button type="submit" class="btn-form">Send Message</button>
+    </form>
+    <p class="form-success" id="formSuccess">Message received — we'll be in touch shortly.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand"><img src="logo.png" alt="Mosaic Media"><p>Premium audio-visual production for brands, events, and creators in the DMV area.</p></div>
+  <div class="footer-col"><h4>Services</h4><ul><li><a href="#">Video Production</a></li><li><a href="#">Photography</a></li><li><a href="#">Audio</a></li><li><a href="#">Live Event AV</a></li><li><a href="#">Livestreaming</a></li></ul></div>
+  <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Portfolio</a></li><li><a href="#">Process</a></li><li><a href="#">Blog</a></li></ul></div>
+  <div class="footer-col"><h4>Connect</h4><ul><li><a href="mailto:info@mosaicmediaproductions.com">Email Us</a></li><li><a href="#">Instagram</a></li><li><a href="#">YouTube</a></li><li><a href="#">LinkedIn</a></li></ul></div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Mosaic Media Productions</span>
+    <div class="social"><a href="#">IG</a><a href="#">YT</a><a href="#">FB</a><a href="#">LI</a></div>
+  </div>
+</footer>
+
+<script>
+// HERO MOSAIC
+const heroGrid = document.getElementById('heroGrid');
+const cols = window.innerWidth <= 640 ? 4 : window.innerWidth <= 1024 ? 6 : 10;
+const rows = window.innerWidth <= 640 ? 5 : 7;
+heroGrid.style.setProperty('--cols', cols);
+heroGrid.style.setProperty('--rows', rows);
+for (let i = 0; i < cols * rows; i++) {
+  const tile = document.createElement('div');
+  tile.className = 'hm-tile';
+  tile.style.opacity = (0.4 + Math.random() * 0.6).toFixed(2);
+  tile.innerHTML = `<img src="https://picsum.photos/seed/an${i}/150/150" alt="" loading="lazy">`;
+  heroGrid.appendChild(tile);
+}
+const heroTiles = heroGrid.querySelectorAll('.hm-tile');
+setInterval(() => {
+  const idx = Math.floor(Math.random() * heroTiles.length);
+  heroTiles[idx].classList.add('pulse');
+  setTimeout(() => heroTiles[idx].classList.remove('pulse'), 2000);
+}, 500);
+
+// PORTFOLIO 3D TILT
+document.querySelectorAll('.pm-tile').forEach(tile => {
+  tile.addEventListener('mousemove', e => {
+    const r = tile.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    tile.style.transform = `perspective(600px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.04)`;
+  });
+  tile.addEventListener('mouseleave', () => { tile.style.transform = ''; });
+});
+
+// CLIENT MARQUEE
+const clients = ['EventCo DC','Nexus Group','Capitol AV','Blue Ridge Weddings','TechStart DC','Union Stage','Arena Event Group','Howard University','Verizon Center','National Harbor','Marriott Hotels','SmithGroup JJR'];
+const track = document.getElementById('marqueeTrack');
+const items = [...clients, ...clients].map(c => `<span class="marquee-item">${c}</span><span class="marquee-item marquee-divider">/</span>`).join('');
+track.innerHTML = items + items;
+
+// ACCORDION
+document.querySelectorAll('.acc-trigger').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.acc-item');
+    const body = item.querySelector('.acc-body');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.acc-item.open').forEach(open => {
+      open.classList.remove('open');
+      open.querySelector('.acc-body').style.maxHeight = '0';
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  });
+});
+
+// STATS COUNTER
+const cObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = parseInt(el.dataset.target);
+    if (!target) return;
+    let cur = 0; const inc = target / 50;
+    const t = setInterval(() => { cur += inc; if (cur >= target) { cur = target; clearInterval(t); } el.textContent = Math.floor(cur) + '+'; }, 30);
+    cObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-num[data-target]').forEach(el => cObs.observe(el));
+
+// SCROLL REVEAL
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => obs.observe(el));
+
+// NAV SCROLL
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// MOBILE MENU
+const burger = document.getElementById('navBurger');
+const mobileMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+  document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+});
+function closeMenu() {
+  burger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// CONTACT FORM
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('[type="submit"]');
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  setTimeout(() => {
+    this.style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+    setTimeout(() => { this.style.display = 'flex'; document.getElementById('formSuccess').style.display = 'none'; this.reset(); btn.textContent = 'Send Message'; btn.disabled = false; }, 4000);
+  }, 800);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mosaic Media – Prototype F: Magazine Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#000;--white:#fff;--gold:#c9b99a;--gold-glow:rgba(201,185,154,.15);--border:#181818;--text-muted:#666;--btn-bg:rgba(255,255,255,.10)}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden}
+
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .85s cubic-bezier(.16,1,.3,1),transform .85s cubic-bezier(.16,1,.3,1)}
+.reveal.vis{opacity:1;transform:none}
+.reveal-left{opacity:0;transform:translateX(-50px);transition:opacity .85s cubic-bezier(.16,1,.3,1),transform .85s cubic-bezier(.16,1,.3,1)}
+.reveal-left.vis{opacity:1;transform:none}
+.reveal-right{opacity:0;transform:translateX(50px);transition:opacity .85s cubic-bezier(.16,1,.3,1),transform .85s cubic-bezier(.16,1,.3,1)}
+.reveal-right.vis{opacity:1;transform:none}
+.s1{transition-delay:.07s}.s2{transition-delay:.14s}.s3{transition-delay:.21s}.s4{transition-delay:.28s}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;justify-content:space-between;align-items:center;padding:1.2rem 4rem;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);transition:padding .4s}
+nav.scrolled{padding:.75rem 4rem}
+.nav-logo img{height:34px}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-size:.75rem;font-weight:500;color:#999;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:color .3s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{padding:.6rem 1.6rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.15);color:var(--white);font-size:.75rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all .3s}
+.nav-cta:hover{background:rgba(255,255,255,.18)}
+.nav-burger{display:none;background:none;border:none;cursor:pointer;padding:.4rem;flex-direction:column;gap:5px;z-index:1100}
+.nav-burger span{display:block;width:22px;height:2px;background:#fff;transition:all .3s}
+.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-burger.open span:nth-child(2){opacity:0}
+.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:1050;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:#fff;transition:color .3s}
+.mobile-menu a:hover{color:var(--gold)}
+.mobile-menu .m-cta{margin-top:1rem;padding:.9rem 2.5rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.2);font-size:.8rem}
+@media(max-width:640px){.nav-burger{display:flex}.nav-cta{display:none}nav{padding:1rem 1.5rem}}
+
+/* HERO — rounded mosaic tiles */
+.hero{height:100vh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hero-mosaic-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--cols,10),1fr);grid-template-rows:repeat(var(--rows,7),1fr);gap:4px;padding:4px}
+.hm-tile{position:relative;cursor:pointer;overflow:hidden;border-radius:8px;transition:all .6s cubic-bezier(.25,.46,.45,.94)}
+.hm-tile img{width:100%;height:100%;object-fit:cover;filter:grayscale(70%) brightness(.28);transition:all .6s}
+.hm-tile::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.4);transition:all .4s;border-radius:8px}
+.hm-tile:hover{z-index:10;transform:scale(1.08)}
+.hm-tile:hover img{filter:grayscale(0%) brightness(.9)}
+.hm-tile:hover::after{background:rgba(201,185,154,.12)}
+.hm-tile.pulse img{filter:grayscale(20%) brightness(.45)}
+
+.hero-editorial{position:relative;z-index:20;text-align:center;padding:0 2rem;max-width:1100px;pointer-events:none}
+.hero-editorial *{pointer-events:auto}
+.hero-kicker{font-size:.65rem;font-weight:600;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;opacity:0;animation:fadeUp .8s .2s forwards}
+.hero-editorial h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(3.5rem,10vw,9rem);font-weight:800;line-height:.9;letter-spacing:-4px;text-transform:uppercase;text-shadow:0 4px 80px rgba(0,0,0,.9);opacity:0;animation:fadeUp 1s .4s forwards}
+.hero-editorial h1 .line-gold{color:var(--gold);display:block}
+.hero-divider{width:60px;height:1px;background:rgba(255,255,255,.2);margin:2.5rem auto;opacity:0;animation:fadeIn .8s .9s forwards}
+.hero-editorial p{font-size:1rem;color:#888;max-width:400px;margin:0 auto 2.5rem;line-height:1.8;opacity:0;animation:fadeUp .8s 1s forwards}
+.hero-btns{display:flex;gap:1rem;justify-content:center;opacity:0;animation:fadeUp .8s 1.2s forwards}
+.btn-primary{padding:1rem 2.5rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.22);color:var(--white);font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all .3s;backdrop-filter:blur(12px)}
+.btn-primary:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
+.btn-ghost{padding:1rem 2.5rem;background:transparent;border:1px solid rgba(255,255,255,.12);color:#888;font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all .3s}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;animation:fadeIn 1s 1.8s forwards}
+.scroll-hint span{font-size:.6rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#333}
+.scroll-arrow{width:18px;height:18px;border-right:1px solid #444;border-bottom:1px solid #444;transform:rotate(45deg);animation:bounce 2s infinite}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.stat{padding:2.5rem;text-align:center;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-num{font-family:'Bricolage Grotesque',sans-serif;font-size:2.2rem;font-weight:800;color:var(--gold)}
+.stat-label{font-size:.65rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-top:.4rem}
+@media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}}
+
+.sec{padding:7rem 4rem}
+@media(max-width:768px){.sec{padding:5rem 1.5rem}}
+.section-label{font-size:.65rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
+.section-desc{color:var(--text-muted);font-size:1rem;line-height:1.8;max-width:520px}
+
+/* ── MAGAZINE SERVICE GRID with curtain reveal ── */
+.mag-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-auto-rows:220px;
+  gap:4px;
+  margin-top:4rem;
+}
+.mag-item{position:relative;overflow:hidden;cursor:pointer;border-radius:12px}
+.mag-item img{width:100%;height:100%;object-fit:cover;filter:grayscale(30%) brightness(.6);transition:all .7s cubic-bezier(.25,.46,.45,.94);transform:scale(1.05)}
+.mag-item:hover img{filter:grayscale(0%) brightness(.5);transform:scale(1)}
+
+/* Curtain reveal — slides up from bottom */
+.mag-curtain{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.98) 0%,rgba(0,0,0,.7) 60%,transparent 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:1.8rem;
+  transform:translateY(60%);
+  transition:transform .6s cubic-bezier(.16,1,.3,1);
+}
+.mag-item:hover .mag-curtain{transform:translateY(0)}
+.mag-item-always{position:absolute;bottom:1.2rem;left:1.5rem;z-index:2;transition:opacity .4s}
+.mag-item:hover .mag-item-always{opacity:0}
+.mag-always-num{font-size:.6rem;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:.3rem}
+.mag-always-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:700}
+
+.mag-num{font-size:.58rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem}
+.mag-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:.6rem;line-height:1.2}
+.mag-desc{font-size:.82rem;color:#aaa;line-height:1.6;margin-bottom:1rem}
+.mag-link{font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:gap .3s}
+.mag-link:hover{gap:.7rem}
+.mag-badge{position:absolute;top:1rem;right:1rem;padding:.3rem .7rem;background:rgba(0,0,0,.7);border:1px solid rgba(201,185,154,.25);font-size:.55rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);border-radius:4px;backdrop-filter:blur(8px)}
+
+/* Grid spans */
+.mag-xl{grid-column:span 3;grid-row:span 2}
+.mag-lg{grid-column:span 2;grid-row:span 2}
+.mag-wide{grid-column:span 3;grid-row:span 1}
+.mag-tall{grid-column:span 1;grid-row:span 2}
+.mag-sm{grid-column:span 1;grid-row:span 1}
+.mag-med{grid-column:span 2;grid-row:span 1}
+
+@media(max-width:1024px){
+  .mag-grid{grid-template-columns:repeat(4,1fr)}
+  .mag-xl{grid-column:span 2}
+  .mag-wide{grid-column:span 2}
+  .mag-curtain{transform:translateY(0)}
+  .mag-item-always{display:none}
+}
+@media(max-width:640px){
+  .mag-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
+  .mag-xl,.mag-lg,.mag-wide{grid-column:span 2}
+  .mag-tall,.mag-med,.mag-sm{grid-column:span 1;grid-row:span 1}
+}
+
+/* CLIENT MARQUEE */
+.marquee-section{padding:3rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden}
+.marquee-label{text-align:center;font-size:.6rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:#2a2a2a;margin-bottom:2rem}
+.marquee-track{display:flex;animation:marquee 30s linear infinite;width:max-content}
+.marquee-track:hover{animation-play-state:paused}
+.marquee-item{padding:0 2.5rem;font-family:'Bricolage Grotesque',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#222;white-space:nowrap;transition:color .3s;cursor:default}
+.marquee-item:hover{color:var(--gold)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* FILMSTRIP REEL */
+.reel-section{padding:6rem 4rem;background:#030303}
+@media(max-width:768px){.reel-section{padding:5rem 1.5rem}}
+.reel-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem}
+.view-all{font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#333;text-decoration:none;transition:color .3s}
+.view-all:hover{color:var(--gold)}
+/* Two-row filmstrip */
+.filmstrip{display:flex;flex-direction:column;gap:4px;overflow:hidden}
+.film-row{display:flex;gap:4px;animation-timing-function:linear;animation-iteration-count:infinite}
+.film-row-1{animation:filmLeft 40s linear infinite}
+.film-row-2{animation:filmRight 40s linear infinite}
+.filmstrip:hover .film-row{animation-play-state:paused}
+@keyframes filmLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes filmRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.film-item{flex:0 0 260px;aspect-ratio:16/10;position:relative;overflow:hidden;border-radius:8px;cursor:pointer;transition:all .4s}
+.film-item:hover{transform:scale(1.04);z-index:5;box-shadow:0 12px 40px var(--gold-glow)}
+.film-item img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%) brightness(.65);transition:all .4s}
+.film-item:hover img{filter:grayscale(0%) brightness(1)}
+.film-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.85) 100%);opacity:0;transition:opacity .4s;border-radius:8px;display:flex;flex-direction:column;justify-content:flex-end;padding:1rem}
+.film-item:hover .film-overlay{opacity:1}
+.film-cat{font-size:.55rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.film-title{font-size:.85rem;font-weight:700;margin-top:.2rem}
+
+/* ACCORDION */
+.acc-section{padding:6rem 4rem}
+@media(max-width:768px){.acc-section{padding:5rem 1.5rem}}
+.accordion{margin-top:3rem;max-width:780px}
+.acc-item{border-bottom:1px solid var(--border)}
+.acc-trigger{width:100%;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 0;background:none;border:none;color:var(--white);cursor:pointer;transition:all .3s;text-align:left}
+.acc-trigger:hover{color:var(--gold)}
+.acc-trigger h3{font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:600}
+.acc-icon{position:relative;width:28px;height:28px;border:1px solid var(--border);flex-shrink:0;transition:all .4s}
+.acc-icon::before,.acc-icon::after{content:'';position:absolute;top:50%;left:50%;background:var(--white);transition:all .3s}
+.acc-icon::before{width:12px;height:1px;transform:translate(-50%,-50%)}
+.acc-icon::after{width:1px;height:12px;transform:translate(-50%,-50%)}
+.acc-item.open .acc-icon{border-color:var(--gold);transform:rotate(45deg)}
+.acc-item.open .acc-icon::before,.acc-item.open .acc-icon::after{background:var(--gold)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.16,1,.3,1)}
+.acc-body-inner{padding:0 0 1.5rem;color:var(--text-muted);font-size:.9rem;line-height:1.8;max-width:580px}
+
+/* TESTIMONIAL */
+.testimonial{text-align:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:6rem 4rem}
+.testimonial blockquote{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.2rem,2.5vw,1.7rem);font-weight:300;max-width:720px;margin:1.5rem auto;line-height:1.7;color:#bbb;font-style:italic}
+.testimonial cite{font-style:normal;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+.testimonial .cite-role{font-size:.7rem;color:#444;margin-top:.3rem}
+
+/* FORM */
+.cta-section{text-align:center;padding:7rem 4rem}
+.cta-section .section-desc{margin:0 auto 3rem}
+.contact-form{max-width:580px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.contact-form input,.contact-form textarea,.contact-form select{width:100%;padding:.95rem 1.2rem;background:rgba(255,255,255,.04);border:1px solid #222;color:#fff;font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:border-color .3s}
+.contact-form input::placeholder,.contact-form textarea::placeholder{color:#444}
+.contact-form select option{background:#111}
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{border-color:var(--gold)}
+.contact-form textarea{resize:vertical;min-height:120px}
+.btn-form{width:100%;padding:1rem;background:var(--btn-bg);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .3s}
+.btn-form:hover{background:rgba(255,255,255,.18)}
+.form-success{display:none;text-align:center;color:var(--gold);font-weight:600;letter-spacing:1px;font-size:.9rem}
+@media(max-width:640px){.form-row{grid-template-columns:1fr}.cta-section{padding:5rem 1.5rem}}
+
+/* FOOTER */
+footer{padding:4rem;border-top:1px solid var(--border);display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand img{height:30px;margin-bottom:1rem}
+.footer-brand p{color:#444;font-size:.85rem;line-height:1.7}
+.footer-col h4{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:.6rem}
+.footer-col a{color:#444;text-decoration:none;font-size:.85rem;transition:color .3s}
+.footer-col a:hover{color:var(--white)}
+.footer-bottom{grid-column:1/-1;padding-top:2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.footer-bottom span{font-size:.7rem;color:#333}
+.social{display:flex;gap:.8rem}
+.social a{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:#444;text-decoration:none;font-size:.75rem;font-weight:700;transition:all .3s}
+.social a:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:1024px){footer{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){footer{grid-template-columns:1fr;padding:3rem 1.5rem}}
+
+.back-link{position:fixed;bottom:1.5rem;right:1.5rem;z-index:900;padding:.55rem 1.1rem;background:rgba(0,0,0,.85);border:1px solid #222;color:#555;font-size:.65rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;backdrop-filter:blur(10px);transition:all .3s}
+.back-link:hover{border-color:var(--gold);color:var(--gold)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translate(0)}50%{transform:rotate(45deg) translate(5px,5px)}}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-logo"><img src="logo.png" alt="Mosaic Media Productions"></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#reel">Reel</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get a Quote</a>
+  <button class="nav-burger" id="navBurger" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#reel" onclick="closeMenu()">Reel</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+  <a href="#contact" class="m-cta" onclick="closeMenu()">Get a Quote</a>
+</div>
+<a href="index.html" class="back-link">&larr; All Prototypes</a>
+
+<!-- HERO — softly rounded mosaic tiles -->
+<section class="hero">
+  <div class="hero-mosaic-grid" id="heroGrid"></div>
+  <div class="hero-editorial">
+    <div class="hero-kicker">DMV's Premier AV Production Studio</div>
+    <h1>Capturing<br><span class="line-gold">Vision</span></h1>
+    <div class="hero-divider"></div>
+    <p>Premium audio-visual production for brands, events, and creators. Every piece of your story, assembled into something extraordinary.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Start Your Project</a>
+      <a href="#services" class="btn-ghost">Explore Services</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-arrow"></div></div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num" data-target="150">0+</div><div class="stat-label">Projects Delivered</div></div>
+  <div class="stat reveal s1"><div class="stat-num" data-target="50">0+</div><div class="stat-label">Happy Clients</div></div>
+  <div class="stat reveal s2"><div class="stat-num" data-target="5">0+</div><div class="stat-label">Years Experience</div></div>
+  <div class="stat reveal s3"><div class="stat-num">DMV</div><div class="stat-label">DC · MD · VA</div></div>
+</div>
+
+<!-- MAGAZINE SERVICE GRID -->
+<section class="sec" id="services">
+  <div class="reveal">
+    <div class="section-label">What We Do</div>
+    <h2 class="section-title">Production Services</h2>
+    <p class="section-desc">Hover any tile to explore what we offer. End-to-end production from concept to delivery.</p>
+  </div>
+  <div class="mag-grid">
+
+    <!-- XL: Video -->
+    <div class="mag-item mag-xl reveal">
+      <img src="https://picsum.photos/seed/fg-v1/900/600" alt="Video Production">
+      <div class="mag-badge">01 / Video</div>
+      <div class="mag-item-always"><div class="mag-always-num">01</div><div class="mag-always-title">Video Production</div></div>
+      <div class="mag-curtain">
+        <div class="mag-num">01 — Production</div>
+        <div class="mag-title">Video Production</div>
+        <div class="mag-desc">Corporate videos, brand films, event coverage, and promotional content shot in cinematic quality.</div>
+        <a href="#contact" class="mag-link">Start a Project &rarr;</a>
+      </div>
+    </div>
+
+    <!-- LG: Photography -->
+    <div class="mag-item mag-lg reveal s1">
+      <img src="https://picsum.photos/seed/fg-p1/600/600" alt="Photography">
+      <div class="mag-badge">02 / Photo</div>
+      <div class="mag-item-always"><div class="mag-always-num">02</div><div class="mag-always-title">Photography</div></div>
+      <div class="mag-curtain">
+        <div class="mag-num">02 — Photography</div>
+        <div class="mag-title">Photography</div>
+        <div class="mag-desc">Event, headshot, product, and brand photography. Gallery-ready images for every platform.</div>
+        <a href="#contact" class="mag-link">Book a Session &rarr;</a>
+      </div>
+    </div>
+
+    <!-- TALL: Audio -->
+    <div class="mag-item mag-tall reveal s2">
+      <img src="https://picsum.photos/seed/fg-a1/300/600" alt="Audio">
+      <div class="mag-badge">03</div>
+      <div class="mag-item-always"><div class="mag-always-num">03</div><div class="mag-always-title">Audio</div></div>
+      <div class="mag-curtain">
+        <div class="mag-num">03 — Audio</div>
+        <div class="mag-title">Audio Production</div>
+        <div class="mag-desc">Podcasts, voice-overs, sound design, and live audio engineering.</div>
+        <a href="#contact" class="mag-link">Learn More &rarr;</a>
+      </div>
+    </div>
+
+    <!-- WIDE: Live Event AV -->
+    <div class="mag-item mag-wide reveal s1">
+      <img src="https://picsum.photos/seed/fg-e1/900/300" alt="Live Event AV">
+      <div class="mag-badge">04 / Live AV</div>
+      <div class="mag-item-always"><div class="mag-always-num">04</div><div class="mag-always-title">Live Event AV</div></div>
+      <div class="mag-curtain">
+        <div class="mag-num">04 — Events</div>
+        <div class="mag-title">Live Event AV</div>
+        <div class="mag-desc">Complete AV setup and technical direction for conferences, galas, and corporate events.</div>
+        <a href="#contact" class="mag-link">Plan Your Event &rarr;</a>
+      </div>
+    </div>
+
+    <!-- MED: Post-Production -->
+    <div class="mag-item mag-med reveal s2">
+      <img src="https://picsum.photos/seed/fg-ed1/600/300" alt="Post-Production">
+      <div class="mag-badge">05 / Post</div>
+      <div class="mag-item-always"><div class="mag-always-num">05</div><div class="mag-always-title">Post-Production</div></div>
+      <div class="mag-curtain">
+        <div class="mag-num">05 — Post</div>
+        <div class="mag-title">Post-Production</div>
+        <div class="mag-desc">Editing, color grading, motion graphics, and mastering for polished final output.</div>
+        <a href="#contact" class="mag-link">Learn More &rarr;</a>
+      </div>
+    </div>
+
+    <!-- MED: Livestreaming -->
+    <div class="mag-item mag-med reveal s3">
+      <img src="https://picsum.photos/seed/fg-s1/600/300" alt="Livestreaming">
+      <div class="mag-badge">06 / Stream</div>
+      <div class="mag-item-always"><div class="mag-always-num">06</div><div class="mag-always-title">Livestreaming</div></div>
+      <div class="mag-curtain">
+        <div class="mag-num">06 — Streaming</div>
+        <div class="mag-title">Livestreaming</div>
+        <div class="mag-desc">Multi-camera live streaming for virtual events, hybrid conferences, and social broadcasts.</div>
+        <a href="#contact" class="mag-link">Go Live &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CLIENT MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-label">Trusted By</div>
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- FILMSTRIP REEL — two rows, opposite directions -->
+<section class="reel-section" id="reel">
+  <div class="reel-header reveal">
+    <div><div class="section-label">Recent Work</div><h2 class="section-title">Highlight Reel</h2></div>
+    <a href="#contact" class="view-all">View All Work &rarr;</a>
+  </div>
+  <div class="filmstrip">
+    <div class="film-row film-row-1" id="filmRow1"></div>
+    <div class="film-row film-row-2" id="filmRow2"></div>
+  </div>
+</section>
+
+<!-- ACCORDION -->
+<section class="acc-section" id="about">
+  <div style="max-width:800px">
+    <div class="reveal"><div class="section-label">Deep Dive</div><h2 class="section-title">Every Service, In Detail</h2></div>
+    <div class="accordion reveal">
+      <div class="acc-item"><button class="acc-trigger"><h3>Video Production &amp; Direction</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Full pipeline from scripting through final delivery. Cinema cameras, professional lighting, and a creative team dedicated to your vision.</div></div></div>
+      <div class="acc-item"><button class="acc-trigger"><h3>Photography &amp; Visual Storytelling</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Event coverage, executive portraits, product photography, and lifestyle sessions. Gallery-ready images for web, print, and social.</div></div></div>
+      <div class="acc-item"><button class="acc-trigger"><h3>Live Event Audio-Visual</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Complete AV setup — LED walls, projection, wireless audio, staging, and real-time technical management.</div></div></div>
+      <div class="acc-item"><button class="acc-trigger"><h3>Livestreaming &amp; Virtual Events</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Multi-camera broadcast quality. Custom graphics packages and real-time monitoring for flawless delivery.</div></div></div>
+      <div class="acc-item"><button class="acc-trigger"><h3>Post-Production &amp; Finishing</h3><span class="acc-icon"></span></button><div class="acc-body"><div class="acc-body-inner">Editing, color grading, motion graphics, VFX, and audio mastering. Unlimited revisions until you're satisfied.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial">
+  <div class="reveal">
+    <div class="section-label">Client Words</div>
+    <blockquote>"Mosaic Media transformed our vision into something beyond what we imagined. Their attention to detail and creative direction elevated our entire brand."</blockquote>
+    <cite>Sarah Mitchell</cite>
+    <div class="cite-role">Marketing Director, TechStart DC</div>
+  </div>
+</section>
+
+<!-- CTA + FORM -->
+<section class="cta-section" id="contact">
+  <div class="reveal">
+    <div class="section-label">Ready to Create?</div>
+    <h2 class="section-title">Let's Bring Your Vision to Life</h2>
+    <p class="section-desc">Tell us about your project. We'll craft a custom production plan that fits your goals and budget.</p>
+    <form class="contact-form" id="contactForm" novalidate>
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+      </div>
+      <select name="service"><option value="" disabled selected>Service Type</option><option>Video Production</option><option>Photography</option><option>Audio Production</option><option>Live Event AV</option><option>Livestreaming</option><option>Post-Production</option><option>Multiple / Not Sure</option></select>
+      <textarea name="message" placeholder="Tell us about your project..." required></textarea>
+      <button type="submit" class="btn-form">Send Message</button>
+    </form>
+    <p class="form-success" id="formSuccess">Message received — we'll be in touch shortly.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-brand"><img src="logo.png" alt="Mosaic Media"><p>Premium audio-visual production for brands, events, and creators in the DMV area.</p></div>
+  <div class="footer-col"><h4>Services</h4><ul><li><a href="#">Video Production</a></li><li><a href="#">Photography</a></li><li><a href="#">Audio</a></li><li><a href="#">Live Event AV</a></li><li><a href="#">Livestreaming</a></li></ul></div>
+  <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Portfolio</a></li><li><a href="#">Process</a></li><li><a href="#">Blog</a></li></ul></div>
+  <div class="footer-col"><h4>Connect</h4><ul><li><a href="mailto:info@mosaicmediaproductions.com">Email Us</a></li><li><a href="#">Instagram</a></li><li><a href="#">YouTube</a></li><li><a href="#">LinkedIn</a></li></ul></div>
+  <div class="footer-bottom"><span>&copy; 2026 Mosaic Media Productions</span><div class="social"><a href="#">IG</a><a href="#">YT</a><a href="#">FB</a><a href="#">LI</a></div></div>
+</footer>
+
+<script>
+// HERO MOSAIC (rounded tiles)
+const heroGrid=document.getElementById('heroGrid');
+const cols=window.innerWidth<=640?4:window.innerWidth<=1024?6:10;
+const rows=window.innerWidth<=640?5:7;
+heroGrid.style.setProperty('--cols',cols);heroGrid.style.setProperty('--rows',rows);
+for(let i=0;i<cols*rows;i++){const t=document.createElement('div');t.className='hm-tile';t.style.opacity=(.4+Math.random()*.6).toFixed(2);t.innerHTML=`<img src="https://picsum.photos/seed/fg${i}/150/150" alt="" loading="${i<15?'eager':'lazy'}">`;heroGrid.appendChild(t);}
+const heroTiles=heroGrid.querySelectorAll('.hm-tile');
+setInterval(()=>{const idx=Math.floor(Math.random()*heroTiles.length);heroTiles[idx].classList.add('pulse');setTimeout(()=>heroTiles[idx].classList.remove('pulse'),2200);},450);
+
+// FILMSTRIP — two rows, 12 items each, seeded differently
+const row1Seeds=['ff1','ff2','ff3','ff4','ff5','ff6','ff7','ff8','ff9','ff10','ff11','ff12'];
+const row2Seeds=['fg1','fg2','fg3','fg4','fg5','fg6','fg7','fg8','fg9','fg10','fg11','fg12'];
+const filmCats=['Corporate Film','Music Video','Event Coverage','Commercial','Livestream','Photography','Documentary','Post-Production','Brand Film','Gala','Conference','Product Shoot'];
+const filmTitles=['Tech Startup Story','Independent Artist','Nonprofit Gala','Lifestyle Brand','Hybrid Summit','Executive Portraits','Founder Story','Color Grade Series','Company Rebrand','Awards Ceremony','Industry Conference','Product Launch'];
+const buildRow=(el,seeds)=>{
+  const html=seeds.map((s,i)=>`<div class="film-item"><img src="https://picsum.photos/seed/${s}/520/325" alt="" loading="lazy"><div class="film-overlay"><span class="film-cat">${filmCats[i]}</span><div class="film-title">${filmTitles[i]}</div></div></div>`).join('');
+  el.innerHTML=html+html; // duplicate for seamless loop
+};
+buildRow(document.getElementById('filmRow1'),row1Seeds);
+buildRow(document.getElementById('filmRow2'),row2Seeds);
+
+// CLIENT MARQUEE
+const clients=['EventCo DC','Nexus Group','Capitol AV','Blue Ridge Weddings','TechStart DC','Union Stage','Arena Event Group','Howard University','National Harbor','Marriott Hotels'];
+const track=document.getElementById('marqueeTrack');
+const items=[...clients,...clients].map(c=>`<span class="marquee-item">${c}</span>`).join('<span class="marquee-item" style="color:#111">/</span>');
+track.innerHTML=items+items;
+
+// STATS COUNTER
+const cObs=new IntersectionObserver(entries=>{entries.forEach(en=>{if(!en.isIntersecting)return;const el=en.target;const tgt=parseInt(el.dataset.target);if(!tgt)return;let cur=0;const inc=tgt/50;const t=setInterval(()=>{cur+=inc;if(cur>=tgt){cur=tgt;clearInterval(t);}el.textContent=Math.floor(cur)+'+';},30);cObs.unobserve(el);});},{threshold:.5});
+document.querySelectorAll('.stat-num[data-target]').forEach(el=>cObs.observe(el));
+
+// ACCORDION
+document.querySelectorAll('.acc-trigger').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.acc-item');const body=item.querySelector('.acc-body');const isOpen=item.classList.contains('open');document.querySelectorAll('.acc-item.open').forEach(o=>{o.classList.remove('open');o.querySelector('.acc-body').style.maxHeight='0';});if(!isOpen){item.classList.add('open');body.style.maxHeight=body.scrollHeight+'px';}});});
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.08});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>obs.observe(el));
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60));
+
+// MOBILE MENU
+const burger=document.getElementById('navBurger');const mobileMenu=document.getElementById('mobileMenu');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');mobileMenu.classList.toggle('open');document.body.style.overflow=mobileMenu.classList.contains('open')?'hidden':'';});
+function closeMenu(){burger.classList.remove('open');mobileMenu.classList.remove('open');document.body.style.overflow='';}
+
+// CONTACT FORM
+document.getElementById('contactForm').addEventListener('submit',function(e){e.preventDefault();const btn=this.querySelector('[type="submit"]');btn.textContent='Sending...';btn.disabled=true;setTimeout(()=>{this.style.display='none';document.getElementById('formSuccess').style.display='block';setTimeout(()=>{this.style.display='flex';document.getElementById('formSuccess').style.display='none';this.reset();btn.textContent='Send Message';btn.disabled=false;},4000);},800);});
+</script>
+</body>
+</html>

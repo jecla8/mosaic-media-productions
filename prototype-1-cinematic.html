@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mosaic Media - Prototype 1: Cinematic Gold</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --gold: #c9b99a;
+    --gold-light: #e0d4bc;
+    --dark: #000;
+    --dark-card: #111;
+    --border: #222;
+    --text: #fff;
+    --text-muted: #888;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left { opacity: 0; transform: translateX(-60px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right { opacity: 0; transform: translateX(60px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+  .reveal-scale { opacity: 0; transform: scale(0.85); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 4rem;
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201,185,154,0.15);
+    transition: all 0.4s;
+  }
+  nav.scrolled { padding: 0.8rem 4rem; background: rgba(0,0,0,0.97); }
+  .nav-logo img { height: 36px; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.8rem; font-weight: 600; color: #aaa;
+    text-decoration: none; letter-spacing: 1px; text-transform: uppercase;
+    transition: color 0.3s; position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--gold); transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    padding: 0.65rem 1.8rem; background: var(--gold); color: #000;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    text-decoration: none; transition: all 0.3s;
+  }
+  .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; align-items: center;
+    position: relative; overflow: hidden;
+    padding: 8rem 4rem 4rem;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0a0806 0%, #000 50%, #060608 100%);
+  }
+  /* FLOATING PHOTO MOSAIC */
+  .mosaic-bg {
+    position: absolute; top: 0; right: -5%; width: 55%; height: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 5px;
+    opacity: 0.5;
+    transform: perspective(1200px) rotateY(-10deg) rotateX(3deg);
+    mask-image: linear-gradient(135deg, transparent 5%, black 25%, black 75%, transparent 95%);
+    -webkit-mask-image: linear-gradient(135deg, transparent 5%, black 25%, black 75%, transparent 95%);
+  }
+  .mosaic-tile {
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    animation: float-tile 6s ease-in-out infinite;
+    transition: all 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+    background-size: cover;
+    background-position: center;
+  }
+  .mosaic-tile::after {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(0,0,0,0.3);
+    transition: all 0.4s;
+  }
+  .mosaic-tile:hover {
+    opacity: 1 !important;
+    transform: scale(1.15) translateZ(30px);
+    z-index: 10;
+    box-shadow: 0 10px 40px rgba(201,185,154,0.25);
+  }
+  .mosaic-tile:hover::after { background: rgba(201,185,154,0.15); }
+  @keyframes float-tile {
+    0%, 100% { transform: translateY(0) translateZ(0); }
+    50% { transform: translateY(-10px) translateZ(15px); }
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 650px; }
+  .hero-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1.5rem;
+    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 900; line-height: 1.05;
+    margin-bottom: 1.5rem;
+    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-title .accent {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero-sub {
+    font-size: 1.05rem; color: var(--text-muted); line-height: 1.8;
+    margin-bottom: 2.5rem; max-width: 480px;
+    opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-btns {
+    display: flex; gap: 1rem;
+    opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn-gold {
+    padding: 1rem 2.5rem; background: var(--gold); color: #000;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    text-decoration: none; transition: all 0.3s; border: none; cursor: pointer;
+  }
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,185,154,0.3); }
+  .btn-outline {
+    padding: 1rem 2.5rem; background: transparent; color: var(--text);
+    border: 1px solid var(--border); font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; text-decoration: none;
+    transition: all 0.3s; cursor: pointer;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .scroll-indicator {
+    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    opacity: 0; animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-indicator span { font-size: 0.6rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #444; }
+  .scroll-arrow { width: 18px; height: 18px; border-right: 2px solid #444; border-bottom: 2px solid #444; transform: rotate(45deg); animation: bounce 2s infinite; }
+  @keyframes bounce { 0%,100% { transform: rotate(45deg) translate(0); } 50% { transform: rotate(45deg) translate(5px, 5px); } }
+
+  /* SECTIONS */
+  section { padding: 7rem 4rem; }
+  .section-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.15;
+  }
+  .section-desc { color: var(--text-muted); font-size: 1rem; line-height: 1.8; max-width: 500px; }
+
+  /* STATS */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: var(--dark-card);
+  }
+  .stat { padding: 3rem; text-align: center; border-right: 1px solid var(--border); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-size: 2.5rem; font-weight: 900; color: var(--gold); }
+  .stat-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-top: 0.5rem; }
+
+  /* SERVICES */
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 4rem; background: var(--border); }
+  .service-card {
+    background: var(--dark-card); padding: 2.5rem; transition: all 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    cursor: pointer; position: relative; overflow: hidden;
+  }
+  .service-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px;
+    background: var(--gold); transition: width 0.5s;
+  }
+  .service-card:hover::after { width: 100%; }
+  .service-card:hover { background: #1a1a1a; transform: translateY(-3px); }
+  .service-card .service-img {
+    width: 100%; height: 150px; object-fit: cover; margin-bottom: 1.5rem;
+    filter: grayscale(40%) brightness(0.8);
+    transition: all 0.5s;
+  }
+  .service-card:hover .service-img { filter: grayscale(0%) brightness(1); transform: scale(1.03); }
+  .service-num {
+    font-size: 0.7rem; font-weight: 700; color: var(--gold); letter-spacing: 2px; margin-bottom: 1rem;
+  }
+  .service-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.8rem; }
+  .service-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
+
+  /* PORTFOLIO MOSAIC - 3D TILT ON HOVER */
+  .portfolio-mosaic {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 140px;
+    gap: 5px;
+    margin-top: 4rem;
+    perspective: 1000px;
+  }
+  .pm-tile {
+    position: relative; overflow: hidden; cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    transform-style: preserve-3d;
+    border-radius: 4px;
+  }
+  .pm-tile:hover {
+    z-index: 20;
+    box-shadow: 0 20px 60px rgba(201,185,154,0.2);
+  }
+  .pm-tile img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: all 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+    filter: grayscale(30%) brightness(0.7);
+  }
+  .pm-tile:hover img {
+    filter: grayscale(0%) brightness(1);
+    transform: scale(1.1);
+  }
+  .pm-tile-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 20%, rgba(0,0,0,0.85) 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .pm-tile:hover .pm-tile-overlay { opacity: 1; }
+  .pm-tile-cat { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+  .pm-tile-title { font-size: 0.95rem; font-weight: 700; margin-top: 0.3rem; transform: translateY(10px); transition: transform 0.4s; }
+  .pm-tile:hover .pm-tile-title { transform: translateY(0); }
+  .pm-play {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.6);
+    width: 55px; height: 55px; border: 2px solid rgba(255,255,255,0.6); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: all 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    backdrop-filter: blur(5px); background: rgba(0,0,0,0.3);
+  }
+  .pm-tile:hover .pm-play { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  .pm-play::after { content: ''; border-left: 10px solid white; border-top: 6px solid transparent; border-bottom: 6px solid transparent; margin-left: 3px; }
+
+  .pm-large { grid-column: span 3; grid-row: span 2; }
+  .pm-med { grid-column: span 2; grid-row: span 2; }
+  .pm-tall { grid-column: span 1; grid-row: span 2; }
+  .pm-wide { grid-column: span 3; grid-row: span 1; }
+  .pm-sm { grid-column: span 1; grid-row: span 1; }
+
+  /* WHY US */
+  .why-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; margin-top: 4rem;
+  }
+  .why-visual {
+    aspect-ratio: 1; position: relative;
+    display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);
+    gap: 5px; perspective: 800px;
+  }
+  .why-tile {
+    overflow: hidden; border-radius: 3px;
+    transition: all 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    cursor: pointer;
+  }
+  .why-tile img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: sepia(30%) brightness(0.8);
+    transition: all 0.5s;
+  }
+  .why-tile:hover {
+    transform: scale(1.12) translateZ(20px);
+    z-index: 5;
+    box-shadow: 0 10px 30px rgba(201,185,154,0.3);
+  }
+  .why-tile:hover img { filter: sepia(0%) brightness(1.1); }
+  .why-points { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; }
+  .why-point { display: flex; gap: 1.5rem; align-items: flex-start; }
+  .why-point-num { font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1; min-width: 40px; }
+  .why-point h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .why-point p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+  /* TESTIMONIAL */
+  .testimonial { text-align: center; background: var(--dark-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .testimonial blockquote {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem); font-weight: 300;
+    max-width: 750px; margin: 2rem auto; line-height: 1.7; font-style: italic; color: #ccc;
+  }
+  .testimonial cite { font-style: normal; font-size: 0.8rem; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+  .testimonial .cite-role { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+  /* CTA */
+  .cta { text-align: center; position: relative; overflow: hidden; }
+  .cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 600px 400px at 50% 50%, rgba(201,185,154,0.07) 0%, transparent 70%);
+  }
+  .cta * { position: relative; }
+  .cta .section-desc { margin: 0 auto 2.5rem; }
+
+  /* FOOTER */
+  footer {
+    padding: 4rem; border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem;
+  }
+  .footer-brand img { height: 32px; margin-bottom: 1rem; }
+  .footer-brand p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.7; }
+  .footer-col h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 0.7rem; }
+  .footer-col a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; transition: color 0.3s; }
+  .footer-col a:hover { color: var(--gold); }
+  .footer-bottom {
+    grid-column: 1 / -1; padding-top: 2rem; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-bottom span { font-size: 0.75rem; color: var(--text-muted); }
+  .social { display: flex; gap: 0.8rem; }
+  .social a {
+    width: 34px; height: 34px; border: 1px solid var(--border); display: flex;
+    align-items: center; justify-content: center; color: var(--text-muted);
+    text-decoration: none; font-size: 0.8rem; transition: all 0.3s;
+  }
+  .social a:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(25px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  /* PARALLAX */
+  .parallax-section {
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+  }
+
+  @media (max-width: 1024px) {
+    nav { padding: 1rem 2rem; }
+    section { padding: 5rem 2rem; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    .portfolio-mosaic { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 120px; }
+    .pm-large { grid-column: span 2; grid-row: span 2; }
+    .pm-tall { grid-row: span 2; }
+    .why-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .why-visual { max-width: 400px; }
+    footer { grid-template-columns: 1fr 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .services-grid { grid-template-columns: 1fr; }
+    .portfolio-mosaic { grid-template-columns: repeat(2, 1fr); }
+    .pm-large, .pm-med, .pm-wide { grid-column: span 2; }
+    .pm-tall { grid-column: span 1; grid-row: span 2; }
+    footer { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .hero { padding: 7rem 1.5rem 3rem; }
+    .hero-btns { flex-direction: column; }
+    .mosaic-bg { display: none; }
+    .nav-burger { display: flex; }
+    .nav-cta { display: none; }
+  }
+
+  /* MOBILE NAV */
+  .nav-burger {
+    display: none; background: none; border: none; cursor: pointer;
+    padding: 0.4rem; flex-direction: column; gap: 5px; z-index: 1100;
+  }
+  .nav-burger span {
+    display: block; width: 22px; height: 2px; background: #fff; transition: all 0.3s;
+  }
+  .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-burger.open span:nth-child(2) { opacity: 0; }
+  .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobile-menu {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97);
+    z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 2rem;
+  }
+  .mobile-menu.open { display: flex; animation: fadeIn 0.3s ease forwards; }
+  .mobile-menu a {
+    font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    text-decoration: none; color: #fff; transition: color 0.3s;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+  .mobile-menu .m-cta {
+    margin-top: 1rem; padding: 0.9rem 2.5rem; background: var(--gold); color: #000;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 1px;
+  }
+  .mobile-menu .m-cta:hover { background: var(--gold-light); color: #000; }
+
+  /* CONTACT FORM */
+  .contact-form {
+    max-width: 580px; margin: 2.5rem auto 0; text-align: left;
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .contact-form input, .contact-form textarea, .contact-form select {
+    width: 100%; padding: 0.95rem 1.2rem;
+    background: rgba(255,255,255,0.04); border: 1px solid #333;
+    color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+    outline: none; transition: border-color 0.3s;
+  }
+  .contact-form input::placeholder, .contact-form textarea::placeholder { color: #555; }
+  .contact-form input:focus, .contact-form textarea:focus { border-color: var(--gold); }
+  .contact-form textarea { resize: vertical; min-height: 120px; }
+  .contact-form .btn-gold { width: 100%; border: none; font-size: 0.85rem; cursor: pointer; }
+  .form-success { display: none; text-align: center; color: var(--gold); font-weight: 700; letter-spacing: 1px; margin-top: 1rem; }
+  @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+
+  /* BACK LINK */
+  .back-link {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 900;
+    padding: 0.55rem 1.1rem; background: rgba(0,0,0,0.8); border: 1px solid #333;
+    color: #888; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; text-decoration: none; backdrop-filter: blur(10px);
+    transition: all 0.3s;
+  }
+  .back-link:hover { border-color: var(--gold); color: var(--gold); }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-logo"><img src="logo.png" alt="Mosaic Media"></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get a Quote</a>
+  <button class="nav-burger" id="navBurger" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#portfolio" onclick="closeMenu()">Portfolio</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+  <a href="#contact" class="m-cta" onclick="closeMenu()">Get a Quote</a>
+</div>
+
+<a href="index.html" class="back-link">&larr; All Prototypes</a>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="mosaic-bg" id="mosaicBg"></div>
+  <div class="hero-content">
+    <div class="hero-label">DMV's Premier AV Production</div>
+    <h1 class="hero-title">Capturing Vision<br>Through <span class="accent">Lens & Sound</span></h1>
+    <p class="hero-sub">Premium audio-visual production for brands, events, and creators. Every piece of your story, assembled into something extraordinary.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-gold">Start Your Project</a>
+      <a href="#portfolio" class="btn-outline">View Our Work</a>
+    </div>
+  </div>
+  <div class="scroll-indicator"><span>Scroll</span><div class="scroll-arrow"></div></div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num" data-target="150">0</div><div class="stat-label">Projects Delivered</div></div>
+  <div class="stat reveal" style="transition-delay:0.1s"><div class="stat-num" data-target="50">0</div><div class="stat-label">Happy Clients</div></div>
+  <div class="stat reveal" style="transition-delay:0.2s"><div class="stat-num" data-target="5">0</div><div class="stat-label">Years Experience</div></div>
+  <div class="stat reveal" style="transition-delay:0.3s"><div class="stat-num">DMV</div><div class="stat-label">& Beyond</div></div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="reveal">
+    <div class="section-label">What We Do</div>
+    <h2 class="section-title">Production Services</h2>
+    <p class="section-desc">End-to-end media production crafted to elevate your brand story.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal" style="transition-delay:0s">
+      <img class="service-img" src="https://picsum.photos/seed/camera1/600/300" alt="Video Production">
+      <div class="service-num">01</div><h3>Video Production</h3><p>Corporate videos, brand films, event coverage, and promotional content shot in cinematic quality.</p>
+    </div>
+    <div class="service-card reveal" style="transition-delay:0.1s">
+      <img class="service-img" src="https://picsum.photos/seed/photo2/600/300" alt="Photography">
+      <div class="service-num">02</div><h3>Photography</h3><p>Professional event, headshot, product, and brand photography that tells your story visually.</p>
+    </div>
+    <div class="service-card reveal" style="transition-delay:0.2s">
+      <img class="service-img" src="https://picsum.photos/seed/audio3/600/300" alt="Audio Production">
+      <div class="service-num">03</div><h3>Audio Production</h3><p>Crystal-clear audio for podcasts, voice-overs, live events, and multimedia projects.</p>
+    </div>
+    <div class="service-card reveal" style="transition-delay:0.3s">
+      <img class="service-img" src="https://picsum.photos/seed/event4/600/300" alt="Live Event AV">
+      <div class="service-num">04</div><h3>Live Event AV</h3><p>Complete audio-visual setup for conferences, galas, concerts, and corporate events.</p>
+    </div>
+    <div class="service-card reveal" style="transition-delay:0.4s">
+      <img class="service-img" src="https://picsum.photos/seed/edit5/600/300" alt="Post-Production">
+      <div class="service-num">05</div><h3>Post-Production</h3><p>Expert editing, color grading, motion graphics, and sound design for polished final output.</p>
+    </div>
+    <div class="service-card reveal" style="transition-delay:0.5s">
+      <img class="service-img" src="https://picsum.photos/seed/stream6/600/300" alt="Livestreaming">
+      <div class="service-num">06</div><h3>Livestreaming</h3><p>Multi-camera live streaming for virtual events and social media with studio-quality production.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" style="background: #080808;">
+  <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1rem;" class="reveal">
+    <div>
+      <div class="section-label">Selected Work</div>
+      <h2 class="section-title">The Mosaic</h2>
+      <p class="section-desc">Click any tile to explore. Each piece is part of a larger picture.</p>
+    </div>
+    <a href="#" class="btn-outline" style="white-space:nowrap;">View All</a>
+  </div>
+  <div class="portfolio-mosaic" id="portfolioMosaic">
+    <div class="pm-tile pm-large reveal-scale">
+      <img src="https://picsum.photos/seed/proj1/800/600" alt="Project">
+      <div class="pm-play"></div>
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Corporate Film</span><span class="pm-tile-title">Tech Startup Brand Story</span></div>
+    </div>
+    <div class="pm-tile pm-tall reveal-scale" style="transition-delay:0.1s">
+      <img src="https://picsum.photos/seed/proj2/400/800" alt="Project">
+      <div class="pm-play"></div>
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Music Video</span><span class="pm-tile-title">Independent Artist Visual</span></div>
+    </div>
+    <div class="pm-tile pm-med reveal-scale" style="transition-delay:0.15s">
+      <img src="https://picsum.photos/seed/proj3/600/500" alt="Project">
+      <div class="pm-play"></div>
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Event Coverage</span><span class="pm-tile-title">Annual Nonprofit Gala</span></div>
+    </div>
+    <div class="pm-tile pm-sm reveal-scale" style="transition-delay:0.2s">
+      <img src="https://picsum.photos/seed/proj4/300/300" alt="Project">
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Photo</span><span class="pm-tile-title">Headshots</span></div>
+    </div>
+    <div class="pm-tile pm-sm reveal-scale" style="transition-delay:0.25s">
+      <img src="https://picsum.photos/seed/proj5/300/300" alt="Project">
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">AV</span><span class="pm-tile-title">Conference</span></div>
+    </div>
+    <div class="pm-tile pm-wide reveal-scale" style="transition-delay:0.3s">
+      <img src="https://picsum.photos/seed/proj6/900/300" alt="Project">
+      <div class="pm-play"></div>
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Commercial</span><span class="pm-tile-title">Lifestyle Brand Product Launch</span></div>
+    </div>
+    <div class="pm-tile pm-med reveal-scale" style="transition-delay:0.35s">
+      <img src="https://picsum.photos/seed/proj7/600/500" alt="Project">
+      <div class="pm-play"></div>
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Livestream</span><span class="pm-tile-title">Hybrid Conference</span></div>
+    </div>
+    <div class="pm-tile pm-sm reveal-scale" style="transition-delay:0.4s">
+      <img src="https://picsum.photos/seed/proj8/300/300" alt="Project">
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Audio</span><span class="pm-tile-title">Podcast Studio</span></div>
+    </div>
+    <div class="pm-tile pm-sm reveal-scale" style="transition-delay:0.45s">
+      <img src="https://picsum.photos/seed/proj9/300/300" alt="Project">
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Photo</span><span class="pm-tile-title">Product Shoot</span></div>
+    </div>
+    <div class="pm-tile pm-sm reveal-scale" style="transition-delay:0.5s">
+      <img src="https://picsum.photos/seed/proj10/300/300" alt="Project">
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">Video</span><span class="pm-tile-title">Event Recap</span></div>
+    </div>
+    <div class="pm-tile pm-sm reveal-scale" style="transition-delay:0.55s">
+      <img src="https://picsum.photos/seed/proj11/300/300" alt="Project">
+      <div class="pm-tile-overlay"><span class="pm-tile-cat">AV</span><span class="pm-tile-title">Concert</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY MOSAIC -->
+<section id="about">
+  <div class="why-grid">
+    <div class="why-visual reveal-left" id="whyMosaic"></div>
+    <div class="reveal-right">
+      <div class="section-label">Why Mosaic</div>
+      <h2 class="section-title">Every Piece Tells<br>a Story</h2>
+      <p class="section-desc">Like a mosaic, we bring together light, sound, vision, and craft to create something greater than the sum of its parts.</p>
+      <div class="why-points">
+        <div class="why-point reveal" style="transition-delay:0.1s"><span class="why-point-num">01</span><div><h4>Cinematic Quality</h4><p>Industry-grade equipment and expertise for film-level production value.</p></div></div>
+        <div class="why-point reveal" style="transition-delay:0.2s"><span class="why-point-num">02</span><div><h4>DMV Expertise</h4><p>Deep roots in the DC, Maryland, Virginia area with strong local connections.</p></div></div>
+        <div class="why-point reveal" style="transition-delay:0.3s"><span class="why-point-num">03</span><div><h4>End-to-End Service</h4><p>From pre-production planning through final delivery, we handle everything.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial">
+  <div class="reveal">
+    <div class="section-label">Client Words</div>
+    <blockquote>"Mosaic Media transformed our vision into something beyond what we imagined. Their attention to detail and creative direction elevated our entire brand."</blockquote>
+    <cite>Sarah Mitchell</cite>
+    <div class="cite-role">Marketing Director</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contact">
+  <div class="reveal">
+    <div class="section-label">Ready to Create?</div>
+    <h2 class="section-title">Let's Bring Your Vision to Life</h2>
+    <p class="section-desc">Tell us about your project. We'll craft a custom production plan that fits your goals and budget.</p>
+    <form class="contact-form" id="contactForm" novalidate>
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+      </div>
+      <select name="service">
+        <option value="" disabled selected>Service Type</option>
+        <option>Video Production</option>
+        <option>Photography</option>
+        <option>Audio Production</option>
+        <option>Live Event AV</option>
+        <option>Livestreaming</option>
+        <option>Post-Production</option>
+        <option>Multiple / Not Sure</option>
+      </select>
+      <textarea name="message" placeholder="Tell us about your project..." required></textarea>
+      <button type="submit" class="btn-gold">Send Message</button>
+    </form>
+    <p class="form-success" id="formSuccess">Message received — we'll be in touch shortly!</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <img src="logo.png" alt="Mosaic Media Productions">
+    <p>Premium audio-visual production for brands, events, and creators in the DMV area.</p>
+  </div>
+  <div class="footer-col"><h4>Services</h4><ul><li><a href="#">Video Production</a></li><li><a href="#">Photography</a></li><li><a href="#">Audio</a></li><li><a href="#">Live Event AV</a></li><li><a href="#">Livestreaming</a></li></ul></div>
+  <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Portfolio</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li></ul></div>
+  <div class="footer-col"><h4>Connect</h4><ul><li><a href="mailto:info@mosaicmediaproductions.com">Email Us</a></li><li><a href="#">Instagram</a></li><li><a href="#">YouTube</a></li><li><a href="#">LinkedIn</a></li></ul></div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Mosaic Media Productions</span>
+    <div class="social"><a href="#">IG</a><a href="#">YT</a><a href="#">FB</a><a href="#">LI</a></div>
+  </div>
+</footer>
+
+<script>
+// === HERO MOSAIC WITH REAL PHOTOS ===
+const mosaicBg = document.getElementById('mosaicBg');
+const photoSeeds = ['cam1','cam2','studio1','film1','light1','mic1','lens1','stage1','crew1','event1',
+  'gear1','video1','sound1','edit1','proj1a','cam3','studio2','film2','light2','mic2',
+  'lens2','stage2','crew2','event2','gear2','video2','sound2','edit2','proj2a','cam4'];
+for (let i = 0; i < 30; i++) {
+  const tile = document.createElement('div');
+  tile.className = 'mosaic-tile';
+  tile.style.backgroundImage = `url(https://picsum.photos/seed/${photoSeeds[i]}/200/200)`;
+  tile.style.animationDelay = (Math.random() * 5).toFixed(1) + 's';
+  tile.style.animationDuration = (4 + Math.random() * 4).toFixed(1) + 's';
+  tile.style.opacity = (0.4 + Math.random() * 0.6).toFixed(2);
+  mosaicBg.appendChild(tile);
+}
+
+// === WHY SECTION PHOTO MOSAIC ===
+const whyMosaic = document.getElementById('whyMosaic');
+for (let i = 0; i < 16; i++) {
+  const tile = document.createElement('div');
+  tile.className = 'why-tile';
+  tile.innerHTML = `<img src="https://picsum.photos/seed/why${i}/250/250" alt="">`;
+  whyMosaic.appendChild(tile);
+}
+
+// === 3D TILT ON PORTFOLIO TILES ===
+document.querySelectorAll('.pm-tile').forEach(tile => {
+  tile.addEventListener('mousemove', (e) => {
+    const rect = tile.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    tile.style.transform = `perspective(600px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) scale(1.04)`;
+  });
+  tile.addEventListener('mouseleave', () => {
+    tile.style.transform = 'perspective(600px) rotateY(0) rotateX(0) scale(1)';
+  });
+});
+
+// === SCROLL REVEAL ===
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => revealObserver.observe(el));
+
+// === NAV SCROLL ===
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// === COUNTER ANIMATION ===
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.target);
+      if (!target) return;
+      let current = 0;
+      const increment = target / 60;
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) { current = target; clearInterval(timer); }
+        el.textContent = Math.floor(current) + '+';
+      }, 25);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObserver.observe(el));
+
+// === MOBILE MENU ===
+const burger = document.getElementById('navBurger');
+const mobileMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+  document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+});
+function closeMenu() {
+  burger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// === CONTACT FORM ===
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('[type="submit"]');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  setTimeout(() => {
+    this.style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+    setTimeout(() => {
+      this.style.display = 'flex';
+      document.getElementById('formSuccess').style.display = 'none';
+      this.reset();
+      btn.textContent = 'Send Message';
+      btn.disabled = false;
+    }, 4000);
+  }, 800);
+});
+</script>
+</body>
+</html>
