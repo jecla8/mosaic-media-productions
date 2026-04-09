@@ -726,6 +726,10 @@ footer{padding:4rem;border-top:1px solid var(--border);display:grid;grid-templat
 </footer>
 
 <script>
+// ── ALWAYS START AT TOP ──
+history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
 // ── INTRO ANIMATION ──
 (function(){
   document.body.style.overflow = 'hidden';
