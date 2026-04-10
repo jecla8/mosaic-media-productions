@@ -747,21 +747,36 @@ window.scrollTo(0, 0);
 const heroGrid = document.getElementById('heroGrid');
 const cols = window.innerWidth <= 640 ? 4 : window.innerWidth <= 1024 ? 6 : 10;
 const rows = window.innerWidth <= 640 ? 5 : 7;
+const totalTiles = cols * rows;
 heroGrid.style.setProperty('--cols', cols);
 heroGrid.style.setProperty('--rows', rows);
-for (let i = 0; i < cols * rows; i++) {
-  const t = document.createElement('div');
-  t.className = 'hm-tile';
-  t.style.opacity = (.4 + Math.random() * .6).toFixed(2);
-  t.innerHTML = `<img src="https://picsum.photos/seed/hv${i}/150/150" alt="" loading="${i < 15 ? 'eager' : 'lazy'}">`;
-  heroGrid.appendChild(t);
+
+function buildMosaic(customImages) {
+  heroGrid.innerHTML = '';
+  for (let i = 0; i < totalTiles; i++) {
+    const t = document.createElement('div');
+    t.className = 'hm-tile';
+    t.style.opacity = (.4 + Math.random() * .6).toFixed(2);
+    // Use custom image (cycling through the list) or fallback to placeholder
+    const src = customImages.length
+      ? `images/mosaic/${customImages[i % customImages.length]}`
+      : `https://picsum.photos/seed/hv${i}/150/150`;
+    t.innerHTML = `<img src="${src}" alt="" loading="${i < 15 ? 'eager' : 'lazy'}">`;
+    heroGrid.appendChild(t);
+  }
+  const heroTiles = heroGrid.querySelectorAll('.hm-tile');
+  setInterval(() => {
+    const idx = Math.floor(Math.random() * heroTiles.length);
+    heroTiles[idx].classList.add('pulse');
+    setTimeout(() => heroTiles[idx].classList.remove('pulse'), 2200);
+  }, 450);
 }
-const heroTiles = heroGrid.querySelectorAll('.hm-tile');
-setInterval(() => {
-  const idx = Math.floor(Math.random() * heroTiles.length);
-  heroTiles[idx].classList.add('pulse');
-  setTimeout(() => heroTiles[idx].classList.remove('pulse'), 2200);
-}, 450);
+
+// Load custom mosaic images from manifest, fall back to placeholders
+fetch('images/mosaic/manifest.json')
+  .then(r => r.json())
+  .then(data => buildMosaic(data.images || []))
+  .catch(() => buildMosaic([]));
 
 // ── CLIENT MARQUEE ──
 const clients = ['EventCo NYC','Nexus Group','Capitol Media','Blue Ridge Weddings','TechStart DC','Union Stage','Arena Event Group','Howard University','National Harbor','Marriott Hotels','SmithGroup','Atlantic Productions'];
