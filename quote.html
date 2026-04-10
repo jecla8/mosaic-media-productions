@@ -273,21 +273,33 @@ input[type="email"]#qEmail:focus{
 const bg = document.getElementById('mosaicBg');
 const cols = window.innerWidth <= 640 ? 4 : window.innerWidth <= 1024 ? 6 : 10;
 const rows = window.innerWidth <= 640 ? 5 : 7;
+const total = cols * rows;
 bg.style.setProperty('--cols', cols);
 bg.style.setProperty('--rows', rows);
-for (let i = 0; i < cols * rows; i++) {
-  const t = document.createElement('div');
-  t.className = 'hm-tile';
-  t.innerHTML = `<img src="https://picsum.photos/seed/qv${i}/150/150" alt="" loading="${i < 12 ? 'eager' : 'lazy'}">`;
-  bg.appendChild(t);
+
+function buildQuoteMosaic(customImages) {
+  bg.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const t = document.createElement('div');
+    t.className = 'hm-tile';
+    const src = customImages.length
+      ? `images/mosaic/${customImages[i % customImages.length]}`
+      : `https://picsum.photos/seed/qv${i}/150/150`;
+    t.innerHTML = `<img src="${src}" alt="" loading="${i < 12 ? 'eager' : 'lazy'}">`;
+    bg.appendChild(t);
+  }
+  const tiles = bg.querySelectorAll('.hm-tile');
+  setInterval(() => {
+    const idx = Math.floor(Math.random() * tiles.length);
+    tiles[idx].classList.add('pulse');
+    setTimeout(() => tiles[idx].classList.remove('pulse'), 2000);
+  }, 600);
 }
-// Subtle pulse on random tiles
-const tiles = bg.querySelectorAll('.hm-tile');
-setInterval(() => {
-  const idx = Math.floor(Math.random() * tiles.length);
-  tiles[idx].classList.add('pulse');
-  setTimeout(() => tiles[idx].classList.remove('pulse'), 2000);
-}, 600);
+
+fetch('images/mosaic/manifest.json')
+  .then(r => r.json())
+  .then(data => buildQuoteMosaic(data.images || []))
+  .catch(() => buildQuoteMosaic([]));
 
 // ── FORM SUBMIT ──
 const form = document.getElementById('qForm');
