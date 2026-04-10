@@ -250,10 +250,13 @@ input[type="email"]#qEmail:focus{
     <div class="q-kicker">Start Your Project</div>
     <h1 class="q-headline">What's your<br><span class="q-gold">email?</span></h1>
     <p class="q-sub">Drop your email below and the Mosaic Media team will reach out within 24 hours to start building your vision.</p>
-    <div class="q-input-wrap">
-      <input type="email" id="qEmail" placeholder="your@email.com" autocomplete="email">
-      <button id="qSubmit">&#8594;</button>
-    </div>
+    <form name="quote-request" method="POST" data-netlify="true" id="quoteForm" style="width:100%;max-width:480px;">
+      <input type="hidden" name="form-name" value="quote-request">
+      <div class="q-input-wrap">
+        <input type="email" name="email" id="qEmail" placeholder="your@email.com" autocomplete="email" required>
+        <button type="submit" id="qSubmit">&#8594;</button>
+      </div>
+    </form>
     <div class="q-hint">We never share your information</div>
   </div>
 
@@ -302,12 +305,13 @@ fetch('images/mosaic/manifest.json')
   .catch(() => buildQuoteMosaic([]));
 
 // ── FORM SUBMIT ──
-const form = document.getElementById('qForm');
+const formWrap = document.getElementById('qForm');
 const thanks = document.getElementById('qThanks');
 const emailInput = document.getElementById('qEmail');
-const submitBtn = document.getElementById('qSubmit');
+const quoteForm = document.getElementById('quoteForm');
 
-function submit() {
+quoteForm.addEventListener('submit', function(e) {
+  e.preventDefault();
   const email = emailInput.value.trim();
   if (!email || !email.includes('@')) {
     emailInput.style.borderColor = 'rgba(255,80,80,.5)';
@@ -315,15 +319,18 @@ function submit() {
     setTimeout(() => emailInput.style.borderColor = '', 1200);
     return;
   }
-  // Animate out form, animate in thanks
-  form.classList.add('hide');
-  setTimeout(() => {
-    thanks.classList.add('show');
-  }, 500);
-}
-
-submitBtn.addEventListener('click', submit);
-emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  // Submit to Netlify Forms
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ 'form-name': 'quote-request', email }).toString()
+  })
+  .finally(() => {
+    // Always show thank you, even if fetch fails
+    formWrap.classList.add('hide');
+    setTimeout(() => thanks.classList.add('show'), 500);
+  });
+});
 
 // Always start at top
 window.scrollTo(0, 0);
